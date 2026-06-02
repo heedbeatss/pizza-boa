@@ -1,0 +1,159 @@
+{
+  "categorias": [
+    {
+      "id": "pizzas-salgadas",
+      "nome": "Pizzas Salgadas",
+      "icone": "🍕",
+      "itens": [
+        {
+          "id": "mussarela",
+          "nome": "Mussarela",
+          "descricao": "Molho de tomate, mussarela e orégano",
+          "tamanhos": [
+            {"nome": "Pequena", "fatias": 4, "preco": 25.00},
+            {"nome": "Média", "fatias": 6, "preco": 35.00},
+            {"nome": "Grande", "fatias": 8, "preco": 45.00}
+          ]
+        },
+        {
+          "id": "calabresa",
+          "nome": "Calabresa",
+          "descricao": "Calabresa, cebola, azeitona e mussarela",
+          "tamanhos": [
+            {"nome": "Pequena", "fatias": 4, "preco": 28.00},
+            {"nome": "Média", "fatias": 6, "preco": 38.00},
+            {"nome": "Grande", "fatias": 8, "preco": 48.00}
+          ]
+        },
+        {
+          "id": "frango-catupiry",
+          "nome": "Frango com Catupiry",
+          "descricao": "Frango desfiado, catupiry e mussarela",
+          "tamanhos": [
+            {"nome": "Pequena", "fatias": 4, "preco": 30.00},
+            {"nome": "Média", "fatias": 6, "preco": 40.00},
+            {"nome": "Grande", "fatias": 8, "preco": 52.00}
+          ]
+        },
+        {
+          "id": "portuguesa",
+          "nome": "Portuguesa",
+          "descricao": "Presunto, ovo, cebola, azeitona e mussarela",
+          "tamanhos": [
+            {"nome": "Pequena", "fatias": 4, "preco": 30.00},
+            {"nome": "Média", "fatias": 6, "preco": 42.00},
+            {"nome": "Grande", "fatias": 8, "preco": 54.00}
+          ]
+        },
+        {
+          "id": "bacon",
+          "nome": "Bacon",
+          "descricao": "Bacon, mussarela e orégano",
+          "tamanhos": [
+            {"nome": "Pequena", "fatias": 4, "preco": 30.00},
+            {"nome": "Média", "fatias": 6, "preco": 40.00},
+            {"nome": "Grande", "fatias": 8, "preco": 52.00}
+          ]
+        },
+        {
+          "id": "margherita",
+          "nome": "Margherita",
+          "descricao": "Mussarela, tomate fresco, manjericão e azeite",
+          "tamanhos": [
+            {"nome": "Pequena", "fatias": 4, "preco": 28.00},
+            {"nome": "Média", "fatias": 6, "preco": 38.00},
+            {"nome": "Grande", "fatias": 8, "preco": 48.00}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "pizzas-doces",
+      "nome": "Pizzas Doces",
+      "icone": "🍫",
+      "itens": [
+        {
+          "id": "chocolate",
+          "nome": "Chocolate",
+          "descricao": "Chocolate ao leite e granulado",
+          "tamanhos": [
+            {"nome": "Pequena", "fatias": 4, "preco": 28.00},
+            {"nome": "Média", "fatias": 6, "preco": 38.00},
+            {"nome": "Grande", "fatias": 8, "preco": 48.00}
+          ]
+        },
+        {
+          "id": "prestigio",
+          "nome": "Prestígio",
+          "descricao": "Chocolate, coco ralado e leite condensado",
+          "tamanhos": [
+            {"nome": "Pequena", "fatias": 4, "preco": 30.00},
+            {"nome": "Média", "fatias": 6, "preco": 40.00},
+            {"nome": "Grande", "fatias": 8, "preco": 52.00}
+          ]
+        },
+        {
+          "id": "banana-canela",
+          "nome": "Banana com Canela",
+          "descricao": "Banana fatiada, canela e leite condensado",
+          "tamanhos": [
+            {"nome": "Pequena", "fatias": 4, "preco": 25.00},
+            {"nome": "Média", "fatias": 6, "preco": 35.00},
+            {"nome": "Grande", "fatias": 8, "preco": 45.00}
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bebidas",
+      "nome": "Bebidas",
+      "icone": "🥤",
+      "itens": [
+        {
+          "id": "coca-2l",
+          "nome": "Coca-Cola 2L",
+          "descricao": "Refrigerante Coca-Cola 2 litros",
+          "tamanhos": [
+            {"nome": "2L", "fatias": null, "preco": 12.00}
+          ]
+        },
+        {
+          "id": "guarana-2l",
+          "nome": "Guaraná 2L",
+          "descricao": "Refrigerante Guaraná Antarctica 2 litros",
+          "tamanhos": [
+            {"nome": "2L", "fatias": null, "preco": 10.00}
+          ]
+        },
+        {
+          "id": "fanta-2l",
+          "nome": "Fanta Laranja 2L",
+          "descricao": "Refrigerante Fanta Laranja 2 litros",
+          "tamanhos": [
+            {"nome": "2L", "fatias": null, "preco": 10.00}
+          ]
+        },
+        {
+          "id": "agua-500",
+          "nome": "Água 500ml",
+          "descricao": "Água mineral sem gás",
+          "tamanhos": [
+            {"nome": "500ml", "fatias": null, "preco": 3.00}
+          ]
+        }
+      ]
+    }
+  ],
+  "adicionais": [
+    {"id": "borda-catupiry", "nome": "Borda de Catupiry", "preco": 8.00},
+    {"id": "borda-chocolate", "nome": "Borda de Chocolate", "preco": 8.00},
+    {"id": "borda-cheddar", "nome": "Borda de Cheddar", "preco": 8.00},
+    {"id": "sem-borda", "nome": "Sem Borda Extra", "preco": 0.00}
+  ],
+  "pagamento": [
+    {"id": "dinheiro", "nome": "Dinheiro", "icone": "💵"},
+    {"id": "pix", "nome": "PIX", "icone": "📱"},
+    {"id": "cartao-credito", "nome": "Cartão de Crédito", "icone": "💳"},
+    {"id": "cartao-debito", "nome": "Cartão de Débito", "icone": "💳"}
+  ]
+}
