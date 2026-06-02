@@ -57,6 +57,7 @@ export default function CardapioSection({ categoria }: Props) {
       {selectedItem && (
         <ItemModal
           item={selectedItem}
+          categoriaNome={categoria.nome}
           onClose={() => setSelectedItem(null)}
           onAdd={handleAdd}
         />

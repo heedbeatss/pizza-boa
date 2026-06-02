@@ -7,11 +7,12 @@ import { fetchCardapio } from '@/lib/api';
 
 interface Props {
   item: CardapioItem;
+  categoriaNome?: string;
   onClose: () => void;
   onAdd: (item: CarrinhoItem) => void;
 }
 
-export default function ItemModal({ item, onClose, onAdd }: Props) {
+export default function ItemModal({ item, categoriaNome, onClose, onAdd }: Props) {
   const [selectedTamanho, setSelectedTamanho] = useState<Tamanho>(item.tamanhos[0]);
   const [metade, setMetade] = useState(false);
   const [segundoItemId, setSegundoItemId] = useState<string | null>(null);
@@ -23,7 +24,7 @@ export default function ItemModal({ item, onClose, onAdd }: Props) {
     fetchCardapio().then(d => setCategorias(d.categorias || [])).catch(() => {});
   });
 
-  const isPizza = item.categoria === 'Pizzas Salgadas' || item.categoria === 'Pizzas Doces';
+  const isPizza = categoriaNome?.toLowerCase().includes('pizza') || false;
 
   const pizzasDisponiveis = categorias
     .flatMap(c => c.itens)
