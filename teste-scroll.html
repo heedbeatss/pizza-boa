@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Teste Scroll</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0a0a; color: #fff; font-family: sans-serif; }
+    .header { position: sticky; top: 0; z-index: 50; background: #1a1a1a; padding: 12px; }
+    .nav { position: sticky; top: 50px; z-index: 40; background: #1a1a1a; padding: 12px; display: flex; gap: 8px; overflow-x: auto; }
+    .nav button { padding: 8px 16px; border-radius: 20px; border: none; cursor: pointer; background: #333; color: #fff; white-space: nowrap; }
+    .nav button.active { background: #581c87; color: #fff; }
+    .section { padding: 24px; min-height: 500px; border-bottom: 2px solid #333; }
+    .section h2 { font-size: 24px; margin-bottom: 16px; color: #a855f7; }
+  </style>
+</head>
+<body>
+
+<div class="header"><h1>🍕 Teste Scroll</h1></div>
+
+<div class="nav" id="nav">
+  <button class="active" onclick="salgadas()">🍕 Salgadas</button>
+  <button onclick="especiais()">⭐ Especiais</button>
+  <button onclick="doces()">🍫 Doces</button>
+  <button onclick="bebidas()">🥤 Bebidas</button>
+</div>
+
+<div class="section" id="salgadas">
+  <h2>SALGADAS</h2>
+  <p>Conteúdo de salgadas... Mussarela, Calabresa, Portuguesa...</p>
+</div>
+
+<div class="section" id="especiais">
+  <h2>ESPECIAIS</h2>
+  <p>Conteúdo de especiais... Supreme, Costela...</p>
+</div>
+
+<div class="section" id="doces">
+  <h2>DOCES</h2>
+  <p>Conteúdo de doces... Chocolate, Nutella...</p>
+</div>
+
+<div class="section" id="bebidas">
+  <h2>BEBIDAS</h2>
+  <p>Conteúdo de bebidas... Coca, Guaraná...</p>
+</div>
+
+<script>
+function salgas() {
+  document.querySelectorAll('#nav button').forEach(function(b) { b.classList.remove('active'); });
+  event.target.classList.add('active');
+  document.getElementById('salgadas').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function especiais() {
+  document.querySelectorAll('#nav button').forEach(function(b) { b.classList.remove('active'); });
+  event.target.classList.add('active');
+  document.getElementById('especiais').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function doces() {
+  document.querySelectorAll('#nav button').forEach(function(b) { b.classList.remove('active'); });
+  event.target.classList.add('active');
+  document.getElementById('doces').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function bebidas() {
+  document.querySelectorAll('#nav button').forEach(function(b) { b.classList.remove('active'); });
+  event.target.classList.add('active');
+  document.getElementById('bebidas').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>

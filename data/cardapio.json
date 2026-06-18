@@ -5,66 +5,43 @@
       "nome": "Pizzas Salgadas",
       "icone": "🍕",
       "itens": [
-        {
-          "id": "mussarela",
-          "nome": "Mussarela",
-          "descricao": "Molho de tomate, mussarela e orégano",
-          "tamanhos": [
-            {"nome": "Pequena", "fatias": 4, "preco": 25.00},
-            {"nome": "Média", "fatias": 6, "preco": 35.00},
-            {"nome": "Grande", "fatias": 8, "preco": 45.00}
-          ]
-        },
-        {
-          "id": "calabresa",
-          "nome": "Calabresa",
-          "descricao": "Calabresa, cebola, azeitona e mussarela",
-          "tamanhos": [
-            {"nome": "Pequena", "fatias": 4, "preco": 28.00},
-            {"nome": "Média", "fatias": 6, "preco": 38.00},
-            {"nome": "Grande", "fatias": 8, "preco": 48.00}
-          ]
-        },
-        {
-          "id": "frango-catupiry",
-          "nome": "Frango com Catupiry",
-          "descricao": "Frango desfiado, catupiry e mussarela",
-          "tamanhos": [
-            {"nome": "Pequena", "fatias": 4, "preco": 30.00},
-            {"nome": "Média", "fatias": 6, "preco": 40.00},
-            {"nome": "Grande", "fatias": 8, "preco": 52.00}
-          ]
-        },
-        {
-          "id": "portuguesa",
-          "nome": "Portuguesa",
-          "descricao": "Presunto, ovo, cebola, azeitona e mussarela",
-          "tamanhos": [
-            {"nome": "Pequena", "fatias": 4, "preco": 30.00},
-            {"nome": "Média", "fatias": 6, "preco": 42.00},
-            {"nome": "Grande", "fatias": 8, "preco": 54.00}
-          ]
-        },
-        {
-          "id": "bacon",
-          "nome": "Bacon",
-          "descricao": "Bacon, mussarela e orégano",
-          "tamanhos": [
-            {"nome": "Pequena", "fatias": 4, "preco": 30.00},
-            {"nome": "Média", "fatias": 6, "preco": 40.00},
-            {"nome": "Grande", "fatias": 8, "preco": 52.00}
-          ]
-        },
-        {
-          "id": "margherita",
-          "nome": "Margherita",
-          "descricao": "Mussarela, tomate fresco, manjericão e azeite",
-          "tamanhos": [
-            {"nome": "Pequena", "fatias": 4, "preco": 28.00},
-            {"nome": "Média", "fatias": 6, "preco": 38.00},
-            {"nome": "Grande", "fatias": 8, "preco": 48.00}
-          ]
-        }
+        {"id": "mussarela", "nome": "Mussarela", "descricao": "Molho, mussarela e orégano", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 25.00}, {"nome": "Média", "fatias": 6, "preco": 35.00}, {"nome": "Grande", "fatias": 8, "preco": 45.00}]},
+        {"id": "calabresa", "nome": "Calabresa", "descricao": "Calabresa, cebola e azeitona", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 28.00}, {"nome": "Média", "fatias": 6, "preco": 38.00}, {"nome": "Grande", "fatias": 8, "preco": 48.00}]},
+        {"id": "frango-catupiry", "nome": "Frango com Catupiry", "descricao": "Frango desfiado, catupiry e mussarela", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 30.00}, {"nome": "Média", "fatias": 6, "preco": 40.00}, {"nome": "Grande", "fatias": 8, "preco": 52.00}]},
+        {"id": "portuguesa", "nome": "Portuguesa", "descricao": "Presunto, ovo, cebola, azeitona e mussarela", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 30.00}, {"nome": "Média", "fatias": 6, "preco": 42.00}, {"nome": "Grande", "fatias": 8, "preco": 54.00}]},
+        {"id": "bacon", "nome": "Bacon", "descricao": "Bacon, mussarela e orégano", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 30.00}, {"nome": "Média", "fatias": 6, "preco": 40.00}, {"nome": "Grande", "fatias": 8, "preco": 52.00}]},
+        {"id": "margherita", "nome": "Margherita", "descricao": "Mussarela, tomate fresco, manjericão e azeite", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 28.00}, {"nome": "Média", "fatias": 6, "preco": 38.00}, {"nome": "Grande", "fatias": 8, "preco": 48.00}]},
+        {"id": "napolitana", "nome": "Napolitana", "descricao": "Mussarela, tomate, parmesão e orégano", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 30.00}, {"nome": "Média", "fatias": 6, "preco": 40.00}, {"nome": "Grande", "fatias": 8, "preco": 52.00}]},
+        {"id": "peperoni", "nome": "Peperoni", "descricao": "Mussarela, peperoni e orégano", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 32.00}, {"nome": "Média", "fatias": 6, "preco": 44.00}, {"nome": "Grande", "fatias": 8, "preco": 56.00}]},
+        {"id": "4-queijos", "nome": "4 Queijos", "descricao": "Mussarela, provolone, parmesão e gorgonzola", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 32.00}, {"nome": "Média", "fatias": 6, "preco": 44.00}, {"nome": "Grande", "fatias": 8, "preco": 58.00}]},
+        {"id": "3-queijos", "nome": "3 Queijos", "descricao": "Mussarela, catupiry e parmesão", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 30.00}, {"nome": "Média", "fatias": 6, "preco": 40.00}, {"nome": "Grande", "fatias": 8, "preco": 52.00}]},
+        {"id": "catupiry", "nome": "Catupiry", "descricao": "Mussarela e catupiry original", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 28.00}, {"nome": "Média", "fatias": 6, "preco": 38.00}, {"nome": "Grande", "fatias": 8, "preco": 48.00}]},
+        {"id": "atum", "nome": "Atum", "descricao": "Atum, cebola e mussarela", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 32.00}, {"nome": "Média", "fatias": 6, "preco": 44.00}, {"nome": "Grande", "fatias": 8, "preco": 56.00}]},
+        {"id": "mista", "nome": "Mista", "descricao": "Presunto, mussarela e orégano", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 26.00}, {"nome": "Média", "fatias": 6, "preco": 36.00}, {"nome": "Grande", "fatias": 8, "preco": 46.00}]},
+        {"id": "vienna", "nome": "Vienna", "descricao": "Linguiça calabresa e mussarela", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 30.00}, {"nome": "Média", "fatias": 6, "preco": 40.00}, {"nome": "Grande", "fatias": 8, "preco": 52.00}]},
+        {"id": "bacon-cheddar", "nome": "Bacon com Cheddar", "descricao": "Bacon e cheddar cremoso", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 32.00}, {"nome": "Média", "fatias": 6, "preco": 44.00}, {"nome": "Grande", "fatias": 8, "preco": 56.00}]},
+        {"id": "frango-cream-cheese", "nome": "Frango com Cream Cheese", "descricao": "Frango desfiado e cream cheese", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 32.00}, {"nome": "Média", "fatias": 6, "preco": 44.00}, {"nome": "Grande", "fatias": 8, "preco": 56.00}]},
+        {"id": "escalopes", "nome": "Escalopes de Carne", "descricao": "Mussarela, carne bovina e cebola", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 34.00}, {"nome": "Média", "fatias": 6, "preco": 46.00}, {"nome": "Grande", "fatias": 8, "preco": 60.00}]},
+        {"id": "camarao", "nome": "Camarão", "descricao": "Camarão, catupiry e mussarela", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 38.00}, {"nome": "Média", "fatias": 6, "preco": 52.00}, {"nome": "Grande", "fatias": 8, "preco": 68.00}]},
+        {"id": "vegetariana", "nome": "Vegetariana", "descricao": "Brócolis, champignon, cebola e mussarela", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 30.00}, {"nome": "Média", "fatias": 6, "preco": 42.00}, {"nome": "Grande", "fatias": 8, "preco": 54.00}]},
+        {"id": "rucula", "nome": "Rúcula com Tomate Seco", "descricao": "Rúcula, tomate seco e mussarela de búfala", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 34.00}, {"nome": "Média", "fatias": 6, "preco": 46.00}, {"nome": "Grande", "fatias": 8, "preco": 60.00}]}
+      ]
+    },
+    {
+      "id": "pizzas-especiais",
+      "nome": "Especiais da Casa",
+      "icone": "⭐",
+      "itens": [
+        {"id": "pizza-supreme", "nome": "Supreme", "descricao": "Peperoni, calabresa, cebola, pimentão e azeitona", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 38.00}, {"nome": "Média", "fatias": 6, "preco": 52.00}, {"nome": "Grande", "fatias": 8, "preco": 68.00}]},
+        {"id": "costela", "nome": "Costela no Bafo", "descricao": "Costela desfiada, barbecue e cebola caramelizada", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 40.00}, {"nome": "Média", "fatias": 6, "preco": 55.00}, {"nome": "Grande", "fatias": 8, "preco": 72.00}]},
+        {"id": "bacon-explosao", "nome": "Bacon Explosão", "descricao": "Bacon, cheddar, parmesão e orégano", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 38.00}, {"nome": "Média", "fatias": 6, "preco": 52.00}, {"nome": "Grande", "fatias": 8, "preco": 68.00}]},
+        {"id": "frango-real", "nome": "Frango Real", "descricao": "Frango, catupiry, milho e batata palha", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 36.00}, {"nome": "Média", "fatias": 6, "preco": 50.00}, {"nome": "Grande", "fatias": 8, "preco": 65.00}]},
+        {"id": "carne-seca", "nome": "Carne Seca com Catupiry", "descricao": "Carne seca desfiada e catupiry", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 40.00}, {"nome": "Média", "fatias": 6, "preco": 55.00}, {"nome": "Grande", "fatias": 8, "preco": 72.00}]},
+        {"id": "marguerita-especial", "nome": "Marguerita Especial", "descricao": "Mussarela de búfala, tomate e manjericão fresco", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 38.00}, {"nome": "Média", "fatias": 6, "preco": 52.00}, {"nome": "Grande", "fatias": 8, "preco": 68.00}]},
+        {"id": "lombo-canadense", "nome": "Lombo Canadense", "descricao": "Lombo, cebola e mussarela", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 38.00}, {"nome": "Média", "fatias": 6, "preco": 52.00}, {"nome": "Grande", "fatias": 8, "preco": 68.00}]},
+        {"id": "coracao", "nome": "Coração de Frango", "descricao": "Coração de frango, catupiry e cebola", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 35.00}, {"nome": "Média", "fatias": 6, "preco": 48.00}, {"nome": "Grande", "fatias": 8, "preco": 62.00}]},
+        {"id": "gorgonzola", "nome": "Gorgonzola com Nozes", "descricao": "Gorgonzola, mozzarella e nozes", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 40.00}, {"nome": "Média", "fatias": 6, "preco": 55.00}, {"nome": "Grande", "fatias": 8, "preco": 72.00}]},
+        {"id": "pepperoni-especial", "nome": "Pepperoni Especial", "descricao": "Pepperoni artesanal e mozzarella premium", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 40.00}, {"nome": "Média", "fatias": 6, "preco": 55.00}, {"nome": "Grande", "fatias": 8, "preco": 72.00}]}
       ]
     },
     {
@@ -72,36 +49,16 @@
       "nome": "Pizzas Doces",
       "icone": "🍫",
       "itens": [
-        {
-          "id": "chocolate",
-          "nome": "Chocolate",
-          "descricao": "Chocolate ao leite e granulado",
-          "tamanhos": [
-            {"nome": "Pequena", "fatias": 4, "preco": 28.00},
-            {"nome": "Média", "fatias": 6, "preco": 38.00},
-            {"nome": "Grande", "fatias": 8, "preco": 48.00}
-          ]
-        },
-        {
-          "id": "prestigio",
-          "nome": "Prestígio",
-          "descricao": "Chocolate, coco ralado e leite condensado",
-          "tamanhos": [
-            {"nome": "Pequena", "fatias": 4, "preco": 30.00},
-            {"nome": "Média", "fatias": 6, "preco": 40.00},
-            {"nome": "Grande", "fatias": 8, "preco": 52.00}
-          ]
-        },
-        {
-          "id": "banana-canela",
-          "nome": "Banana com Canela",
-          "descricao": "Banana fatiada, canela e leite condensado",
-          "tamanhos": [
-            {"nome": "Pequena", "fatias": 4, "preco": 25.00},
-            {"nome": "Média", "fatias": 6, "preco": 35.00},
-            {"nome": "Grande", "fatias": 8, "preco": 45.00}
-          ]
-        }
+        {"id": "chocolate", "nome": "Chocolate", "descricao": "Chocolate ao leite e granulado", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 28.00}, {"nome": "Média", "fatias": 6, "preco": 38.00}, {"nome": "Grande", "fatias": 8, "preco": 48.00}]},
+        {"id": "prestigio", "nome": "Prestígio", "descricao": "Chocolate, coco ralado e leite condensado", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 30.00}, {"nome": "Média", "fatias": 6, "preco": 40.00}, {"nome": "Grande", "fatias": 8, "preco": 52.00}]},
+        {"id": "banana-canela", "nome": "Banana com Canela", "descricao": "Banana fatiada, canela e leite condensado", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 25.00}, {"nome": "Média", "fatias": 6, "preco": 35.00}, {"nome": "Grande", "fatias": 8, "preco": 45.00}]},
+        {"id": "romeu-julieta", "nome": "Romeu e Julieta", "descricao": "Goiabada e queijo minas", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 28.00}, {"nome": "Média", "fatias": 6, "preco": 38.00}, {"nome": "Grande", "fatias": 8, "preco": 48.00}]},
+        {"id": "chocolate-branco", "nome": "Chocolate Branco", "descricao": "Chocolate branco e morango", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 32.00}, {"nome": "Média", "fatias": 6, "preco": 42.00}, {"nome": "Grande", "fatias": 8, "preco": 54.00}]},
+        {"id": "banana-nutella", "nome": "Banana com Nutella", "descricao": "Banana e Nutella", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 35.00}, {"nome": "Média", "fatias": 6, "preco": 48.00}, {"nome": "Grande", "fatias": 8, "preco": 62.00}]},
+        {"id": "nutella", "nome": "Nutella", "descricao": "Nutella com morango", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 38.00}, {"nome": "Média", "fatias": 6, "preco": 50.00}, {"nome": "Grande", "fatias": 8, "preco": 65.00}]},
+        {"id": "sorvete", "nome": "Sorvete", "descricao": "Chocolate, sorvete e cobertura", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 35.00}, {"nome": "Média", "fatias": 6, "preco": 48.00}, {"nome": "Grande", "fatias": 8, "preco": 62.00}]},
+        {"id": "churros", "nome": "Churros", "descricao": "Doce de leite, canela e açúcar", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 30.00}, {"nome": "Média", "fatias": 6, "preco": 42.00}, {"nome": "Grande", "fatias": 8, "preco": 54.00}]},
+        {"id": "m&m", "nome": "M&M's", "descricao": "Chocolate ao leite e M&M's", "tamanhos": [{"nome": "Pequena", "fatias": 4, "preco": 36.00}, {"nome": "Média", "fatias": 6, "preco": 48.00}, {"nome": "Grande", "fatias": 8, "preco": 62.00}]}
       ]
     },
     {
@@ -109,38 +66,16 @@
       "nome": "Bebidas",
       "icone": "🥤",
       "itens": [
-        {
-          "id": "coca-2l",
-          "nome": "Coca-Cola 2L",
-          "descricao": "Refrigerante Coca-Cola 2 litros",
-          "tamanhos": [
-            {"nome": "2L", "fatias": null, "preco": 12.00}
-          ]
-        },
-        {
-          "id": "guarana-2l",
-          "nome": "Guaraná 2L",
-          "descricao": "Refrigerante Guaraná Antarctica 2 litros",
-          "tamanhos": [
-            {"nome": "2L", "fatias": null, "preco": 10.00}
-          ]
-        },
-        {
-          "id": "fanta-2l",
-          "nome": "Fanta Laranja 2L",
-          "descricao": "Refrigerante Fanta Laranja 2 litros",
-          "tamanhos": [
-            {"nome": "2L", "fatias": null, "preco": 10.00}
-          ]
-        },
-        {
-          "id": "agua-500",
-          "nome": "Água 500ml",
-          "descricao": "Água mineral sem gás",
-          "tamanhos": [
-            {"nome": "500ml", "fatias": null, "preco": 3.00}
-          ]
-        }
+        {"id": "coca-2l", "nome": "Coca-Cola 2L", "descricao": "Refrigerante Coca-Cola 2 litros", "tamanhos": [{"nome": "2L", "fatias": null, "preco": 12.00}]},
+        {"id": "guarana-2l", "nome": "Guaraná 2L", "descricao": "Refrigerante Guaraná Antarctica 2 litros", "tamanhos": [{"nome": "2L", "fatias": null, "preco": 10.00}]},
+        {"id": "fanta-2l", "nome": "Fanta Laranja 2L", "descricao": "Refrigerante Fanta Laranja 2 litros", "tamanhos": [{"nome": "2L", "fatias": null, "preco": 10.00}]},
+        {"id": "coca-lata", "nome": "Coca-Cola Lata", "descricao": "Refrigerante Coca-Cola lata 350ml", "tamanhos": [{"nome": "350ml", "fatias": null, "preco": 6.00}]},
+        {"id": "guarana-lata", "nome": "Guaraná Lata", "descricao": "Refrigerante Guaraná lata 350ml", "tamanhos": [{"nome": "350ml", "fatias": null, "preco": 5.00}]},
+        {"id": "suco-laranja", "nome": "Suco de Laranja", "descricao": "Suco natural de laranja 500ml", "tamanhos": [{"nome": "500ml", "fatias": null, "preco": 8.00}]},
+        {"id": "suco-uva", "nome": "Suco de Uva", "descricao": "Suco integral de uva 500ml", "tamanhos": [{"nome": "500ml", "fatias": null, "preco": 8.00}]},
+        {"id": "agua-500", "nome": "Água 500ml", "descricao": "Água mineral sem gás", "tamanhos": [{"nome": "500ml", "fatias": null, "preco": 3.00}]},
+        {"id": "agua-gas", "nome": "Água com Gás", "descricao": "Água mineral com gás 500ml", "tamanhos": [{"nome": "500ml", "fatias": null, "preco": 4.00}]},
+        {"id": "cerveja", "nome": "Cerveja Pilsen", "descricao": "Cerveja pilsen 600ml", "tamanhos": [{"nome": "600ml", "fatias": null, "preco": 8.00}]}
       ]
     }
   ],

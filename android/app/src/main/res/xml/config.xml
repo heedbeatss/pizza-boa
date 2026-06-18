@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<widget xmlns="http://www.w3.org/ns/widgets" id="com.pizzaboa.delivery" version="1.0.0">
+  <name>Pizza Boa</name>
+  <description>Delivery de Pizza</description>
+  <content src="index.html"/>
+  <preference name="StatusBarStyle" value="lightcontent"/>
+  <preference name="BackgroundColor" value="0xff0a0a0a"/>
+</widget>
