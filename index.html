@@ -925,7 +925,7 @@ async function submitOrder() {
   var obs = document.getElementById('obs').value.trim();
   var pay = document.querySelector('.pay-btn.active') ? document.querySelector('.pay-btn.active').dataset.pay : 'dinheiro';
   var troco = document.getElementById('troco').value.trim();
-  if (!nome || nome.length < 2) { showError('Informe um nome valido.'); return; }
+  if (!nome || nome.trim().split(/\s+/).length < 2) { showError('Informe nome e sobrenome.'); return; }
   var telClean = telefone.replace(/\D/g,'');
   if (telClean.length < 10 || telClean.length > 11) { showError('Informe um telefone valido com DDD.'); return; }
   if (!retirada) {
