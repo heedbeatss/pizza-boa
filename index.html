@@ -603,6 +603,7 @@ var TAXA_FIXA_MOTOBOY = 3.0;
 var TAXA_POR_KM = 1.0;
 var TAXA_MAXIMA = 25.0;
 var MIN_PEDIDO_GRATIS = 100;
+var MIN_PEDIDO_ENTREGA = 30;
 var zonaAtual = null;
 
 var ZONAS_ENTREGA = [
@@ -883,6 +884,7 @@ function renderCheckoutSummary() {
   var entrega = zonaAtual ? zonaAtual.valor : 0;
   if (zonaAtual) { h += '<div class="cart-summary-row"><span class="lbl">' + (retirada ? '🏪 Retirada' : '🛵 Entrega (' + zonaAtual.nome + ')') + '</span><span style="color:' + (zonaAtual.valor === 0 ? '#4ade80' : '#a855f7') + '">' + (zonaAtual.valor === 0 ? (retirada ? 'GRATIS' : 'GRATIS') : 'R$ ' + zonaAtual.valor.toFixed(2)) + '</span></div>'; }
   if (total > 0 && total < MIN_PEDIDO_GRATIS && zonaAtual && zonaAtual.valor > 0) { h += '<div style="margin-top:8px;padding:8px;background:rgba(74,222,128,.1);border-radius:8px;font-size:12px;color:#4ade80;text-align:center">Falta R$ ' + (MIN_PEDIDO_GRATIS - total).toFixed(2) + ' para entrega GRATIS!</div>'; }
+  if (!retirada && total > 0 && total < MIN_PEDIDO_ENTREGA) { h += '<div style="margin-top:8px;padding:8px;background:rgba(248,113,113,.1);border-radius:8px;font-size:12px;color:#f87171;text-align:center">⚠️ Valor minimo para entrega: R$ ' + MIN_PEDIDO_ENTREGA.toFixed(2) + ' (falta R$ ' + (MIN_PEDIDO_ENTREGA - total).toFixed(2) + ')</div>'; }
   h += '<div class="cart-summary-total"><span>Total</span><span class="val">R$ ' + (total + entrega).toFixed(2) + '</span></div></div>';
   document.getElementById('checkoutSummary').innerHTML = h;
 }
@@ -931,6 +933,7 @@ async function submitOrder() {
   if (!retirada) {
     if (!rua || !numero || !bairro) { showError('Preencha o endereco completo.'); return; }
     if (!zonaAtual) { showError('Nao foi possivel calcular a entrega.'); return; }
+    if (total < MIN_PEDIDO_ENTREGA) { showError('Valor minimo para entrega e R$ ' + MIN_PEDIDO_ENTREGA.toFixed(2) + '.'); return; }
   }
   if (pay === 'dinheiro' && !troco) { showError('Informe o valor para calcular o troco.'); return; }
   contadorPedidos++; localStorage.setItem('contadorPedidos', contadorPedidos);
@@ -1296,6 +1299,20 @@ document.addEventListener('DOMContentLoaded', function() {
   updateHorarioHeader();
   render();
   updateCartButton();
+  // Carrega configuracoes da aba Config da planilha
+  carregarConfigAPI().then(function(config) {
+    if (config) {
+      if (config.taxaMaxima !== undefined) TAXA_MAXIMA = parseFloat(config.taxaMaxima) || TAXA_MAXIMA;
+      if (config.pedidoGratisMinimo !== undefined) MIN_PEDIDO_GRATIS = parseFloat(config.pedidoGratisMinimo) || MIN_PEDIDO_GRATIS;
+      if (config.valorMinimoEntrega !== undefined) MIN_PEDIDO_ENTREGA = parseFloat(config.valorMinimoEntrega) || MIN_PEDIDO_ENTREGA;
+      if (config.horarioInicio !== undefined) HORA_INICIO = parseInt(config.horarioInicio) || HORA_INICIO;
+      if (config.horarioFim !== undefined) HORA_FIM = parseInt(config.horarioFim) || HORA_FIM;
+      if (config.whatsapp !== undefined) window.WHATSAPP_NUM = config.whatsapp;
+      console.log('[Config] Carregada da planilha:', config);
+    }
+  }).catch(function(e) {
+    console.warn('[Config] Usando valores padrao:', e.message);
+  });
   // Tenta carregar cardapio da API em background
   carregarCardapioAPI().then(function(categoriasAPI) {
     if (categoriasAPI && categoriasAPI.length > 0) {
