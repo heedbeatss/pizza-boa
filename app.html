@@ -1277,11 +1277,15 @@ function showHome() {
   document.getElementById('adminPedidoDetail').style.display = 'none';
   document.getElementById('checkoutSuccess').style.display = 'none';
   document.getElementById('checkoutForm').style.display = 'block';
+  document.getElementById('retiradaToggle').style.display = 'flex';
   document.getElementById('cardapio').style.display = 'block';
   document.getElementById('catNavMenu').style.display = 'flex';
   document.getElementById('cartBtn').style.display = 'none';
   document.getElementById('meusPedidosSection').style.display = 'block';
   zonaAtual = null;
+  retirada = false;
+  document.getElementById('btnEntrega').classList.add('active');
+  document.getElementById('btnRetirada').classList.remove('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
   setTimeout(function() { carregarPedidos(); }, 500);
 }
