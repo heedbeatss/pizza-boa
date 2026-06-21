@@ -887,6 +887,19 @@ function renderCheckoutSummary() {
   if (!retirada && total > 0 && total < MIN_PEDIDO_ENTREGA) { h += '<div style="margin-top:8px;padding:8px;background:rgba(248,113,113,.1);border-radius:8px;font-size:12px;color:#f87171;text-align:center">⚠️ Valor minimo para entrega: R$ ' + MIN_PEDIDO_ENTREGA.toFixed(2) + ' (falta R$ ' + (MIN_PEDIDO_ENTREGA - total).toFixed(2) + ')</div>'; }
   h += '<div class="cart-summary-total"><span>Total</span><span class="val">R$ ' + (total + entrega).toFixed(2) + '</span></div></div>';
   document.getElementById('checkoutSummary').innerHTML = h;
+  // Desabilita o botao se entrega e valor insuficiente
+  var btn = document.querySelector('.submit-btn');
+  if (btn) {
+    if (!retirada && total > 0 && total < MIN_PEDIDO_ENTREGA) {
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      btn.textContent = 'Minimo R$ ' + MIN_PEDIDO_ENTREGA.toFixed(2) + ' para entrega';
+    } else {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.textContent = 'Confirmar Pedido';
+    }
+  }
 }
 
 function buscarCEP() {
@@ -914,7 +927,7 @@ var STATUS_PEDIDO = {
   cancelado: { nome: 'Cancelado', class: 'cancelado', icon: '❌' }
 };
 
-async function submitOrder() {
+function submitOrder() {
   var nome = document.getElementById('nome').value.trim();
   var telefone = document.getElementById('telefone').value.trim();
   var rua = document.getElementById('rua').value.trim();
