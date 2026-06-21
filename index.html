@@ -1053,17 +1053,23 @@ function submitOrder() {
 
 function showError(msg) { var el = document.getElementById('checkoutError'); el.textContent = msg; el.style.display = 'block'; }
 
-// Matching de pedidoId: usa data/horario (ISO) como primario, telefone como fallback
+// Matching de pedidoId: usa ID direto primeiro, depois data/horario, depois telefone
 function matchPedidoApi(localP, apiPedidos) {
   if (!apiPedidos || apiPedidos.length === 0) return null;
-  // 1) Tenta match por data/horario exato (ISO timestamp)
+  // 1) Tenta match por ID direto (mais confiavel)
+  var matchId = apiPedidos.find(function(a) { return String(a.id) === String(localP.id); });
+  if (matchId) {
+    console.log('[MATCH] Encontrou por ID:', localP.id);
+    return matchId;
+  }
+  // 2) Tenta match por data/horario exato (ISO timestamp)
   if (localP.data) {
-    var match = apiPedidos.find(function(a) { return a.data && a.data === localP.data; });
-    if (match) {
+    var matchData = apiPedidos.find(function(a) { return a.data && a.data === localP.data; });
+    if (matchData) {
       console.log('[MATCH] Encontrou por data exata:', localP.data);
-      return match;
+      return matchData;
     }
-    // 1b) Tenta match por data com tolerancia de 2s (diferencas de timestamp)
+    // 2b) Tenta match por data com tolerancia de 2s
     var localTime = new Date(localP.data).getTime();
     var matchProx = apiPedidos.find(function(a) {
       if (!a.data) return false;
@@ -1075,7 +1081,7 @@ function matchPedidoApi(localP, apiPedidos) {
       return matchProx;
     }
   }
-  // 2) Fallback: telefone + mesmo dia (data YYYY-MM-DD)
+  // 3) Fallback: telefone + mesmo dia
   if (localP.telefone) {
     var telLocal = localP.telefone.replace(/\D/g, '');
     var diaLocal = localP.data ? localP.data.substring(0, 10) : null;
@@ -1089,7 +1095,6 @@ function matchPedidoApi(localP, apiPedidos) {
       if (candidatos.length >= 1) {
         console.log('[MATCH] Encontrou por telefone+dia:', telLocal, diaLocal, candidatos.length, 'candidato(s)');
         if (candidatos.length === 1) return candidatos[0];
-        // Se multiplos, pega o mais proximo pelo timestamp
         if (localP.data) {
           candidatos.sort(function(a, b) {
             return Math.abs(new Date(a.data) - new Date(localP.data)) - Math.abs(new Date(b.data) - new Date(localP.data));
