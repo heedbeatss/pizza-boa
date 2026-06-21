@@ -628,12 +628,7 @@ async function atualizarConfig() {
     if (config.whatsapp !== undefined) window.WHATSAPP_NUM = config.whatsapp;
 
     // Atualiza o aviso de horario na pagina inicial
-    var aviso = document.getElementById('avisoHorario');
-    if (aviso) {
-      var aberta = isPizzariaAberta();
-      aviso.style.display = aberta ? 'none' : 'block';
-      if (!aberta) aviso.textContent = getHorarioInfo();
-    }
+    updateHorarioHeader();
 
     // Mostra confirmacao
     alert('Configuracoes atualizadas com sucesso!\n\n' +
