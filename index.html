@@ -233,6 +233,7 @@ document.addEventListener('touchstart', function requestOnTouch() {
   </div>
   
   <button onclick="limparPedidosEntregues()" style="width:100%;padding:10px;border-radius:8px;background:rgba(248,113,113,.1);color:#f87171;border:1px solid rgba(248,113,113,.3);cursor:pointer;margin-bottom:16px;font-size:13px">🗑️ Limpar Pedidos Entregues</button>
+  <button onclick="atualizarConfig()" style="width:100%;padding:10px;border-radius:8px;background:rgba(88,28,135,.2);color:#a855f7;border:1px solid rgba(88,28,135,.4);cursor:pointer;margin-bottom:16px;font-size:13px">🔄 Atualizar Config da Planilha</button>
   
   <!-- Stats -->
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
@@ -606,6 +607,45 @@ async function carregarConfigAPI() {
     return r.data;
   }
   return null;
+}
+
+async function atualizarConfig() {
+  var config = await carregarConfigAPI();
+  if (config) {
+    // Atualiza horarios
+    if (config.horarioInicio !== undefined) {
+      HORA_INICIO = parseInt(config.horarioInicio) || HORA_INICIO;
+      isPizzariaAberta(); // Forca recalcular o aviso
+    }
+    if (config.horarioFim !== undefined) {
+      HORA_FIM = parseInt(config.horarioFim) || HORA_FIM;
+      isPizzariaAberta(); // Forca recalcular o aviso
+    }
+    // Atvaliza taxas e valores
+    if (config.taxaMaxima !== undefined) TAXA_MAXIMA = parseFloat(config.taxaMaxima) || TAXA_MAXIMA;
+    if (config.pedidoGratisMinimo !== undefined) MIN_PEDIDO_GRATIS = parseFloat(config.pedidoGratisMinimo) || MIN_PEDIDO_GRATIS;
+    if (config.valorMinimoEntrega !== undefined) MIN_PEDIDO_ENTREGA = parseFloat(config.valorMinimoEntrega) || MIN_PEDIDO_ENTREGA;
+    if (config.whatsapp !== undefined) window.WHATSAPP_NUM = config.whatsapp;
+
+    // Atualiza o aviso de horario na pagina inicial
+    var aviso = document.getElementById('avisoHorario');
+    if (aviso) {
+      var aberta = isPizzariaAberta();
+      aviso.style.display = aberta ? 'none' : 'block';
+      if (!aberta) aviso.textContent = getHorarioInfo();
+    }
+
+    // Mostra confirmacao
+    alert('Configuracoes atualizadas com sucesso!\n\n' +
+          'Horario: ' + HORA_INICIO + 'h - ' + HORA_FIM + 'h\n' +
+          'Taxa Maxima: R$ ' + TAXA_MAXIMA.toFixed(2) + '\n' +
+          'Pedido Gratis Minimo: R$ ' + MIN_PEDIDO_GRATIS.toFixed(2) + '\n' +
+          'Valor Minimo Entrega: R$ ' + MIN_PEDIDO_ENTREGA.toFixed(2));
+
+    console.log('[Config] Atualizada manualmente:', config);
+  } else {
+    alert('Erro ao carregar configuracoes da planilha.');
+  }
 }
 
 // Normaliza itens da API (tamanho unico -> array de tamanhos)
