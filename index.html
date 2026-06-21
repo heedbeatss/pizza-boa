@@ -1036,7 +1036,21 @@ function matchPedidoApi(localP, apiPedidos) {
   // 1) Tenta match por data/horario exato (ISO timestamp)
   if (localP.data) {
     var match = apiPedidos.find(function(a) { return a.data && a.data === localP.data; });
-    if (match) return match;
+    if (match) {
+      console.log('[MATCH] Encontrou por data exata:', localP.data);
+      return match;
+    }
+    // 1b) Tenta match por data com tolerancia de 2s (diferencas de timestamp)
+    var localTime = new Date(localP.data).getTime();
+    var matchProx = apiPedidos.find(function(a) {
+      if (!a.data) return false;
+      var apiTime = new Date(a.data).getTime();
+      return Math.abs(apiTime - localTime) < 2000;
+    });
+    if (matchProx) {
+      console.log('[MATCH] Encontrou por data aproximada:', localP.data, '~', matchProx.data);
+      return matchProx;
+    }
   }
   // 2) Fallback: telefone + mesmo dia (data YYYY-MM-DD)
   if (localP.telefone) {
@@ -1049,16 +1063,20 @@ function matchPedidoApi(localP, apiPedidos) {
         var diaApi = a.data ? a.data.substring(0, 10) : null;
         return telApi === telLocal && diaApi === diaLocal;
       });
-      if (candidatos.length === 1) return candidatos[0];
-      // Se multiplos, pega o mais proximo pelo timestamp
-      if (candidatos.length > 1 && localP.data) {
-        candidatos.sort(function(a, b) {
-          return Math.abs(new Date(a.data) - new Date(localP.data)) - Math.abs(new Date(b.data) - new Date(localP.data));
-        });
+      if (candidatos.length >= 1) {
+        console.log('[MATCH] Encontrou por telefone+dia:', telLocal, diaLocal, candidatos.length, 'candidato(s)');
+        if (candidatos.length === 1) return candidatos[0];
+        // Se multiplos, pega o mais proximo pelo timestamp
+        if (localP.data) {
+          candidatos.sort(function(a, b) {
+            return Math.abs(new Date(a.data) - new Date(localP.data)) - Math.abs(new Date(b.data) - new Date(localP.data));
+          });
+        }
         return candidatos[0];
       }
     }
   }
+  console.log('[MATCH] NAO encontrou match para:', localP.id, localP.data, localP.telefone);
   return null;
 }
 
@@ -1093,12 +1111,14 @@ function carregarPedidos() {
   if (usandoAPI) {
     carregarPedidosAPI().then(function(apiPedidos) {
       if (apiPedidos && apiPedidos.length > 0) {
+        console.log('[POLLING] API retornou', apiPedidos.length, 'pedidos');
         // Verifica se houve alteracao local recente (menos de 30s) e preserva
         var ultimaAlt = JSON.parse(localStorage.getItem('ultimaAlteracaoStatus') || 'null');
         var agora = Date.now();
         if (ultimaAlt && (agora - ultimaAlt.time < 30000)) {
           for (var i = 0; i < apiPedidos.length; i++) {
             if (apiPedidos[i].id == ultimaAlt.id) {
+              console.log('[POLLING] Preservando alteracao local:', ultimaAlt.id, ultimaAlt.status);
               apiPedidos[i].status = ultimaAlt.status;
               break;
             }
@@ -1106,6 +1126,7 @@ function carregarPedidos() {
         }
         var locais = JSON.parse(localStorage.getItem('pizzaPedidos') || '[]');
         var meusLocais = locais.filter(function(p) { return p && p.deviceId === deviceId; });
+        console.log('[POLLING] Meus pedidos locais:', meusLocais.length);
         var idsApiUsados = []; // IDs da API ja atribuidos (evita duplicata)
         // Para cada pedido local, tenta encontrar o pedidoId correto na API
         var meusAtualizados = meusLocais.map(function(p) {
