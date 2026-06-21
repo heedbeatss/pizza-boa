@@ -735,6 +735,8 @@ function calcularEntrega() {
   }
   if (!encontrada) encontrada = { nome: "Zona Piracicaba", dist: 8, taxa: 11 };
   var taxa = encontrada.taxa;
+  // Aplica limite maximo de taxa
+  if (taxa > TAXA_MAXIMA) taxa = TAXA_MAXIMA;
   var totalPed = 0; for (var i = 0; i < cart.length; i++) totalPed += cart[i].preco * cart[i].qty;
   if (totalPed >= MIN_PEDIDO_GRATIS) taxa = 0;
   var tMin = Math.round(encontrada.dist * 5 + 20);
