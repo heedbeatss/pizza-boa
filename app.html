@@ -1241,14 +1241,14 @@ function verPedidoAdmin(id) {
   var statuses = ['recebido','confirmado','em_preparo','no_forno','entregue','cancelado'];
   if (!p.endereco || !p.endereco.retirada) { statuses.splice(statuses.indexOf('entregue'), 0, 'saiu_entrega', 'retirou'); }
   else { statuses.splice(statuses.indexOf('entregue'), 0, 'retirou'); }
-  for (var s = 0; s < statuses.length; s++) { var ss = STATUS_PEDIDO[statuses[s]]; if (!ss) continue; var bg = p.status === statuses[s] ? '#581c87' : '#1a1a1a'; var color = p.status === statuses[s] ? '#fff' : '#a1a1a1'; h += '<button onclick="alterarStatus(\'' + id + '\', \'' + statuses[s] + '\')" style="padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-size:13px;background:' + bg + ';color:' + color + '">' + ss.icon + ' ' + ss.nome + '</button>'; }
+  for (var s = 0; s < statuses.length; s++) { var ss = STATUS_PEDIDO[statuses[s]]; if (!ss) continue; var bg = p.status === statuses[s] ? '#581c87' : '#1a1a1a'; var color = p.status === statuses[s] ? '#fff' : '#a1a1a1'; h += '<button onclick="alterarStatus(\'' + String(id).replace(/'/g, "\\'") + '\', \'' + statuses[s] + '\')" style="padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-size:13px;background:' + bg + ';color:' + color + '">' + ss.icon + ' ' + ss.nome + '</button>'; }
   h += '</div>';
   document.getElementById('adminPedidoDetalhe').innerHTML = h;
   document.getElementById('adminPage').style.display = 'none';
   document.getElementById('adminPedidoDetail').style.display = 'block';
 }
 
-async function alterarStatus(id, status) {
+function alterarStatus(id, status) {
   var pedidos = JSON.parse(localStorage.getItem('pizzaPedidos') || '[]');
   var p = pedidos.find(function(x) { return x.id == id; });
   if (p) {
