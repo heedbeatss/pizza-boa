@@ -1093,7 +1093,8 @@ function carregarPedidos() {
         });
         // Pedidos da API que nao sao meus (de outros dispositivos)
         var idsMeusNovos = meusAtualizados.map(function(p) { return p.id; });
-        var deOutros = apiPedidos.filter(function(a) { return idsMeusNovos.indexOf(String(a.id)) < 0; });
+        var idsIgnorados = JSON.parse(localStorage.getItem('pizzaPedidosIgnorados') || '[]');
+        var deOutros = apiPedidos.filter(function(a) { return idsMeusNovos.indexOf(String(a.id)) < 0 && idsIgnorados.indexOf(String(a.id)) < 0; });
         var merged = deOutros.concat(meusAtualizados);
         // Sincroniza contador com o maior ID da API
         for (var j = 0; j < apiPedidos.length; j++) {
@@ -1231,6 +1232,13 @@ function limparPedidosEntregues() {
   var removidos = pedidos.length - restantes.length;
   if (removidos === 0) { alert('Nenhum pedido entregue para limpar.'); return; }
   if (confirm('Limpar ' + removidos + ' pedido(s) entregue(s)/retirado(s)?\n\nOs pedidos em andamento serao mantidos.')) {
+    // Salva os IDs removidos para o polling nao trazer de volta
+    var idsRemovidos = pedidos.filter(function(p) {
+      return p.status === 'entregue' || p.status === 'retirou' || p.status === 'cancelado';
+    }).map(function(p) { return String(p.id); });
+    var idsIgnorados = JSON.parse(localStorage.getItem('pizzaPedidosIgnorados') || '[]');
+    idsIgnorados = idsIgnorados.concat(idsRemovidos);
+    localStorage.setItem('pizzaPedidosIgnorados', JSON.stringify(idsIgnorados));
     localStorage.setItem('pizzaPedidos', JSON.stringify(restantes));
     carregarAdminPedidosLocal();
     carregarPedidos();
@@ -1373,7 +1381,8 @@ setInterval(function(){
           return p;
         });
         var idsMeusNovos = meusAtualizados.map(function(p) { return p.id; });
-        var deOutros = apiPedidos.filter(function(a) { return idsMeusNovos.indexOf(String(a.id)) < 0; });
+        var idsIgnorados = JSON.parse(localStorage.getItem('pizzaPedidosIgnorados') || '[]');
+        var deOutros = apiPedidos.filter(function(a) { return idsMeusNovos.indexOf(String(a.id)) < 0 && idsIgnorados.indexOf(String(a.id)) < 0; });
         var merged = deOutros.concat(meusAtualizados);
         // Sincroniza contador
         for (var j = 0; j < apiPedidos.length; j++) {
