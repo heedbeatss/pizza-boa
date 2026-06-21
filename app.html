@@ -1249,25 +1249,26 @@ function verPedidoAdmin(id) {
 }
 
 function alterarStatus(id, status) {
+  console.log('[ALTERAR STATUS] id:', id, 'status:', status);
   var pedidos = JSON.parse(localStorage.getItem('pizzaPedidos') || '[]');
-  var p = pedidos.find(function(x) { return x.id == id; });
+  var p = pedidos.find(function(x) { return String(x.id) == String(id); });
   if (p) {
+    console.log('[ALTERAR STATUS] Pedido encontrado:', p.id, 'status atual:', p.status);
     p.status = status;
     p._statusManual = true;
     localStorage.setItem('pizzaPedidos', JSON.stringify(pedidos));
-    // Marca timestamp da ultima alteracao local para nao ser sobrescrita pela API
     localStorage.setItem('ultimaAlteracaoStatus', JSON.stringify({ id: id, status: status, time: Date.now() }));
-    // Extrai ID numérico corretamente (remove #)
     var apiId = String(p.id).replace('#', '');
     if (usandoAPI && apiId) { atualizarStatusAPI(apiId, status); }
-    // Notificacao quando saiu para entrega
     if (status === 'saiu_entrega') {
       sendNotification('🛵 Saiu para Entrega!', 'Pedido ' + id + ' saiu para entrega!', 'saiu-entrega-' + id);
     }
-    // Recarrega a lista do admin (so com localStorage, sem buscar da API)
     carregarAdminPedidosLocal();
     verPedidoAdmin(id);
     carregarPedidos();
+    console.log('[ALTERAR STATUS] Concluido. Novo status:', status);
+  } else {
+    console.log('[ALTERAR STATUS] Pedido NAO encontrado. IDs:', pedidos.map(function(x){return x.id;}));
   }
 }
 
