@@ -1310,9 +1310,7 @@ function alterarStatus(id, status) {
     localStorage.setItem('ultimaAlteracaoStatus', JSON.stringify({ id: id, status: status, time: Date.now() }));
     var apiId = String(p.id).replace('#', '');
     if (usandoAPI && apiId) { atualizarStatusAPI(apiId, status); }
-    if (status === 'saiu_entrega') {
-      sendNotification('🛵 Saiu para Entrega!', 'Pedido ' + id + ' saiu para entrega!', 'saiu-entrega-' + id);
-    }
+    // Notificacao sera enviada pelo polling do usuario quando detectar a mudanca
     carregarAdminPedidosLocal();
     verPedidoAdmin(id);
     carregarPedidos();
