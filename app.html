@@ -201,7 +201,7 @@ document.addEventListener('touchstart', function requestOnTouch() {
 </div>
 
 <div style="background:linear-gradient(90deg,rgba(88,28,135,.3),rgba(168,85,247,.2));padding:10px 16px;text-align:center;font-size:13px;color:#a855f7;border-bottom:1px solid rgba(88,28,135,.2)">
-    PEDIDOS ACIMA DE R$ 100 TÊM ENTREGA GRATIS!
+    PEDIDOS ACIMA DE R$ <span id="valorGratis">100</span> TÊM ENTREGA GRATIS!
   </div>
   <div class="cat-nav"><div class="cat-nav-inner" id="catNavMenu"></div></div>
 
@@ -629,6 +629,9 @@ async function atualizarConfig() {
 
     // Atualiza o aviso de horario na pagina inicial
     updateHorarioHeader();
+    // Atualiza o texto de entrega gratis
+    var valorGratis = document.getElementById('valorGratis');
+    if (valorGratis) valorGratis.textContent = MIN_PEDIDO_GRATIS.toFixed(0);
 
     // Mostra confirmacao
     alert('Configuracoes atualizadas com sucesso!\n\n' +
