@@ -927,6 +927,7 @@ async function submitOrder() {
   var obs = document.getElementById('obs').value.trim();
   var pay = document.querySelector('.pay-btn.active') ? document.querySelector('.pay-btn.active').dataset.pay : 'dinheiro';
   var troco = document.getElementById('troco').value.trim();
+  var total = 0; for (var i = 0; i < cart.length; i++) total += cart[i].preco * cart[i].qty;
   if (!nome || nome.trim().split(/\s+/).length < 2) { showError('Informe nome e sobrenome.'); return; }
   var telClean = telefone.replace(/\D/g,'');
   if (telClean.length < 10 || telClean.length > 11) { showError('Informe um telefone valido com DDD.'); return; }
@@ -938,7 +939,6 @@ async function submitOrder() {
   if (pay === 'dinheiro' && !troco) { showError('Informe o valor para calcular o troco.'); return; }
   contadorPedidos++; localStorage.setItem('contadorPedidos', contadorPedidos);
   var pedidoId = String(contadorPedidos);
-  var total = 0; for (var i = 0; i < cart.length; i++) total += cart[i].preco * cart[i].qty;
   var entrega = retirada ? 0 : (zonaAtual ? zonaAtual.valor : 0);
   var totalFinal = total + entrega;
   var enderecoObj = retirada ? { retirada: true } : { cep: cep, rua: rua, numero: numero, bairro: bairro, cidade: cidade, complemento: complemento, referencia: referencia };
