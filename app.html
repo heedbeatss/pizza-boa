@@ -388,7 +388,7 @@ document.addEventListener('touchstart', function requestOnTouch() {
       </div>
       <div id="trocoSection" class="form-group" style="display:none">
         <label>💵 Valor em mãos *</label>
-        <input type="text" id="troco" placeholder="Ex: 100,00">
+        <input type="text" id="troco" placeholder="Ex: 100,00" oninput="formatarTroco(this)">
         <div style="font-size:11px;color:#a1a1a1;margin-top:4px">Informe o valor para calcular o troco</div>
       </div>
       <div class="form-group">
@@ -1006,6 +1006,22 @@ function selectPay(btn) { document.querySelectorAll('.pay-btn').forEach(function
 function copyPixKey() { var key = document.getElementById('pixKey').textContent; if (navigator.clipboard) { navigator.clipboard.writeText(key).then(function() { showCopyMsg(); }).catch(function() { fallbackCopy(key); }); } else { fallbackCopy(key); } }
 function fallbackCopy(text) { var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); showCopyMsg(); } catch(e) { alert('Copie: ' + text); } document.body.removeChild(ta); }
 function showCopyMsg() { var msg = document.getElementById('copyMsg'); msg.style.display = 'block'; setTimeout(function() { msg.style.display = 'none'; }, 2000); }
+function formatarTroco(input) {
+  // Remove tudo que não é número ou vírgula
+  var valor = input.value.replace(/[^0-9,]/g, '');
+  // Garante só uma vírgula
+  var partes = valor.split(',');
+  if (partes.length > 2) valor = partes[0] + ',' + partes.slice(1).join('');
+  // Limita a 2 casas decimais
+  if (partes[1] && partes[1].length > 2) valor = partes[0] + ',' + partes[1].substring(0, 2);
+  input.value = valor;
+}
+function parseTroco(valor) {
+  // Converte "100,00" ou "100.00" ou "100" para número
+  if (!valor) return 0;
+  valor = valor.replace(/\./g, '').replace(',', '.');
+  return parseFloat(valor) || 0;
+}
 
 var STATUS_PEDIDO = {
   recebido: { nome: 'Recebido', class: 'recebido', icon: '📥' },
@@ -1041,6 +1057,12 @@ function submitOrder() {
     if (total < MIN_PEDIDO_ENTREGA) { showError('Valor minimo para entrega e R$ ' + MIN_PEDIDO_ENTREGA.toFixed(2) + '.'); return; }
   }
   if (pay === 'dinheiro' && !troco) { showError('Informe o valor para calcular o troco.'); return; }
+  if (pay === 'dinheiro' && troco) {
+    var trocoNum = parseTroco(troco);
+    var entrega = retirada ? 0 : (zonaAtual ? zonaAtual.valor : 0);
+    var totalFinal = total + entrega;
+    if (trocoNum < totalFinal) { showError('Valor em mãos (R$ ' + troco + ') é menor que o total (R$ ' + totalFinal.toFixed(2) + ').'); return; }
+  }
   contadorPedidos++; localStorage.setItem('contadorPedidos', contadorPedidos);
   var pedidoId = String(contadorPedidos);
   var entrega = retirada ? 0 : (zonaAtual ? zonaAtual.valor : 0);
