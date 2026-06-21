@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   <meta name="theme-color" content="#581c87">
   <title>Pizza Boa - Delivery</title>
+  <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiUGl6emEgQm9hIiwic2hvcnRfbmFtZSI6IlBpenphIEJvYSIsInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMGEwYTBhIiwidGhlbWVfY29sb3IiOiIjNTgxYzg3IiwiaWNvbnMiOltdfQ==">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     html { overflow-y: auto; }
@@ -119,11 +120,36 @@
 (function(){
   
   document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
-  document.addEventListener('keydown', function(e){
-    if (e.key === 'F12'){ e.preventDefault(); return; }
-    if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')){ e.preventDefault(); return; }
-    if (e.ctrlKey && (e.key === 'U' || e.key === 'u')){ e.preventDefault(); return; }
-  });
+  // ============ NOTIFICACOES ============
+  function requestNotificationPermission() {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }
+  function sendNotification(title, body, tag) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      try {
+        new Notification(title, {
+          body: body,
+          tag: tag || 'pizza-boa',
+          icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍕</text></svg>',
+          badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍕</text></svg>',
+          vibrate: [200, 100, 200]
+        });
+      } catch(e) {
+        console.warn('[Notification] Erro:', e.message);
+      }
+    }
+  }
+  // Solicita permissao na primeira interacao
+  document.addEventListener('click', function requestOnClick() {
+    requestNotificationPermission();
+    document.removeEventListener('click', requestOnClick);
+  }, { once: true });
+  document.addEventListener('touchstart', function requestOnTouch() {
+    requestNotificationPermission();
+    document.removeEventListener('touchstart', requestOnTouch);
+  }, { once: true });
   
   var _devtools = / /;
   _devtools.toString = function(){ 
@@ -985,6 +1011,8 @@ function submitOrder() {
   document.getElementById('checkoutSuccess').style.display = 'block';
   document.getElementById('pedidoNum').textContent = pedidoId;
   document.getElementById('waLink').href = 'https://wa.me/19984356289?text=' + encodeURIComponent(msg);
+  // Notificacao de pedido realizado
+  sendNotification('🍕 Pedido Realizado!', 'Pedido ' + pedidoId + ' recebido. Total: R$ ' + totalFinal.toFixed(2), 'pedido-' + pedidoId);
   var cardHtml = '<div style="background:#1a1a1a;border-radius:12px;padding:16px;border-left:3px solid #581c87">';
   cardHtml += '<div style="display:flex;justify-content:space-between;margin-bottom:8px"><strong>' + pedidoId + '</strong><span style="color:#f59e0b;font-size:13px">📥 Recebido</span></div>';
   cardHtml += '<div style="font-size:13px;color:#a1a1a1;margin-bottom:8px">';
@@ -1106,6 +1134,21 @@ function carregarPedidos() {
         localStorage.setItem('contadorPedidos', contadorPedidos);
         // Atualiza localStorage com o merge
         localStorage.setItem('pizzaPedidos', JSON.stringify(merged));
+        // Detecta mudanca de status para saiu_entrega e notifica
+        var statusAnterior = JSON.parse(localStorage.getItem('pizzaPedidosStatus') || '{}');
+        for (var m = 0; m < meusAtualizados.length; m++) {
+          var pedidoAtual = meusAtualizados[m];
+          var statusAnt = statusAnterior[pedidoAtual.id];
+          if (statusAnt && statusAnt !== 'saiu_entrega' && pedidoAtual.status === 'saiu_entrega') {
+            sendNotification('🛵 Saiu para Entrega!', 'Pedido ' + pedidoAtual.id + ' saiu para entrega!', 'saiu-entrega-' + pedidoAtual.id);
+          }
+        }
+        // Salva status atuais para proxima comparacao
+        var novosStatus = {};
+        for (var s = 0; s < meusAtualizados.length; s++) {
+          novosStatus[meusAtualizados[s].id] = meusAtualizados[s].status;
+        }
+        localStorage.setItem('pizzaPedidosStatus', JSON.stringify(novosStatus));
         // Re-renderiza
         carregarPedidos();
       }
@@ -1217,6 +1260,10 @@ async function alterarStatus(id, status) {
     // Extrai ID numérico corretamente (remove #)
     var apiId = String(p.id).replace('#', '');
     if (usandoAPI && apiId) { atualizarStatusAPI(apiId, status); }
+    // Notificacao quando saiu para entrega
+    if (status === 'saiu_entrega') {
+      sendNotification('🛵 Saiu para Entrega!', 'Pedido ' + id + ' saiu para entrega!', 'saiu-entrega-' + id);
+    }
     // Recarrega a lista do admin (so com localStorage, sem buscar da API)
     carregarAdminPedidosLocal();
     verPedidoAdmin(id);
