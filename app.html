@@ -1496,7 +1496,45 @@ document.addEventListener('DOMContentLoaded', function() {
     if (vg) vg.textContent = parseFloat(savedGratis).toFixed(0);
   }
 });
-// Event delegation para botoes de status do admin
+// Polling de config: verifica a cada 30s se houve alteracoes na planilha
+setInterval(function() {
+  if (!usandoAPI) return;
+  carregarConfigAPI().then(function(config) {
+    if (config) {
+      var mudou = false;
+      // Verifica horario
+      if (config.horarioInicio !== undefined && parseInt(config.horarioInicio) !== HORA_INICIO) {
+        HORA_INICIO = parseInt(config.horarioInicio) || HORA_INICIO;
+        mudou = true;
+      }
+      if (config.horarioFim !== undefined && parseInt(config.horarioFim) !== HORA_FIM) {
+        HORA_FIM = parseInt(config.horarioFim) || HORA_FIM;
+        mudou = true;
+      }
+      // Verifica taxas
+      if (config.taxaMaxima !== undefined && parseFloat(config.taxaMaxima) !== TAXA_MAXIMA) {
+        TAXA_MAXIMA = parseFloat(config.taxaMaxima) || TAXA_MAXIMA;
+        mudou = true;
+      }
+      if (config.pedidoGratisMinimo !== undefined && parseFloat(config.pedidoGratisMinimo) !== MIN_PEDIDO_GRATIS) {
+        MIN_PEDIDO_GRATIS = parseFloat(config.pedidoGratisMinimo) || MIN_PEDIDO_GRATIS;
+        mudou = true;
+      }
+      if (config.valorMinimoEntrega !== undefined && parseFloat(config.valorMinimoEntrega) !== MIN_PEDIDO_ENTREGA) {
+        MIN_PEDIDO_ENTREGA = parseFloat(config.valorMinimoEntrega) || MIN_PEDIDO_ENTREGA;
+        mudou = true;
+      }
+      // Se algo mudou, atualiza a UI
+      if (mudou) {
+        updateHorarioHeader();
+        var vg = document.getElementById('valorGratis');
+        if (vg) vg.textContent = MIN_PEDIDO_GRATIS.toFixed(0);
+        localStorage.setItem('configPedidoGratis', MIN_PEDIDO_GRATIS);
+        console.log('[POLLING CONFIG] Config atualizada automaticamente');
+      }
+    }
+  }).catch(function() {});
+}, 30000);
 document.addEventListener('click', function(e) {
   var btn = e.target.closest('.status-btn');
   if (btn) {
