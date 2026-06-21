@@ -629,13 +629,12 @@ var HORA_INICIO = 18;
 var HORA_FIM = 1;
 
 function isPizzariaAberta() {
-  return true; 
   var agora = new Date();
   var dia = agora.getDay();
   var hora = agora.getHours();
   if (DIAS_FUNCIONAMENTO.indexOf(dia) < 0) return false;
-  if (hora >= 18) return true;
-  if (hora < 1) return true;
+  if (hora >= HORA_INICIO) return true;
+  if (hora < HORA_FIM) return true;
   return false;
 }
 
@@ -644,8 +643,8 @@ function getHorarioInfo() {
   var dia = agora.getDay();
   var hora = agora.getHours();
   var nomes = ['Domingo','Segunda','Terca','Quarta','Quinta','Sexta','Sabado'];
-  if (DIAS_FUNCIONAMENTO.indexOf(dia) < 0) return 'Hoje e ' + nomes[dia] + '. Fechados. Terca a Domingo, 18h-01h.';
-  if (hora >= 1 && hora < 18) return 'Ainda nao abrimos. Hoje abrimos as 18h.';
+  if (DIAS_FUNCIONAMENTO.indexOf(dia) < 0) return 'Hoje e ' + nomes[dia] + '. Fechados. Terca a Domingo, ' + HORA_INICIO + 'h-' + HORA_FIM + 'h.';
+  if (hora >= HORA_FIM && hora < HORA_INICIO) return 'Ainda nao abrimos. Hoje abrimos as ' + HORA_INICIO + 'h.';
   return 'Estamos abertos!';
 }
 
@@ -882,7 +881,7 @@ function updateHorarioHeader() {
 
 function updateCartButton() { var btn = document.getElementById('cartBtn'); if (!btn) return; var count = 0, total = 0; for (var i = 0; i < cart.length; i++) { count += cart[i].qty; total += cart[i].preco * cart[i].qty; } if (count > 0) { btn.style.display = 'block'; document.getElementById('cartCount').textContent = count + ' item' + (count > 1 ? 's' : ''); document.getElementById('cartTotal').textContent = 'R$ ' + total.toFixed(2); } else { btn.style.display = 'none'; } }
 
-function toggleCart() { if (!isPizzariaAberta()) { alert('Estamos fechados!\n\nHorario: Terca a Domingo, 18h-01h.'); return; } var modal = document.getElementById('cartModal'); modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex'; if (modal.style.display === 'flex') renderCart(); }
+function toggleCart() { if (!isPizzariaAberta()) { alert('Estamos fechados!\n\nHorario: Terca a Domingo, ' + HORA_INICIO + 'h-' + HORA_FIM + 'h.'); return; } var modal = document.getElementById('cartModal'); modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex'; if (modal.style.display === 'flex') renderCart(); }
 
 function renderCart() {
   var h = ''; var total = 0;
