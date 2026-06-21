@@ -117,39 +117,40 @@
   </style>
 
 <script>
+// ============ NOTIFICACOES (global) ============
+function requestNotificationPermission() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+function sendNotification(title, body, tag) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    try {
+      new Notification(title, {
+        body: body,
+        tag: tag || 'pizza-boa',
+        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍕</text></svg>',
+        badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍕</text></svg>',
+        vibrate: [200, 100, 200]
+      });
+    } catch(e) {
+      console.warn('[Notification] Erro:', e.message);
+    }
+  }
+}
+// Solicita permissao na primeira interacao
+document.addEventListener('click', function requestOnClick() {
+  requestNotificationPermission();
+  document.removeEventListener('click', requestOnClick);
+}, { once: true });
+document.addEventListener('touchstart', function requestOnTouch() {
+  requestNotificationPermission();
+  document.removeEventListener('touchstart', requestOnTouch);
+}, { once: true });
+
 (function(){
   
   document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
-  // ============ NOTIFICACOES ============
-  function requestNotificationPermission() {
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
-  }
-  function sendNotification(title, body, tag) {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      try {
-        new Notification(title, {
-          body: body,
-          tag: tag || 'pizza-boa',
-          icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍕</text></svg>',
-          badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍕</text></svg>',
-          vibrate: [200, 100, 200]
-        });
-      } catch(e) {
-        console.warn('[Notification] Erro:', e.message);
-      }
-    }
-  }
-  // Solicita permissao na primeira interacao
-  document.addEventListener('click', function requestOnClick() {
-    requestNotificationPermission();
-    document.removeEventListener('click', requestOnClick);
-  }, { once: true });
-  document.addEventListener('touchstart', function requestOnTouch() {
-    requestNotificationPermission();
-    document.removeEventListener('touchstart', requestOnTouch);
-  }, { once: true });
   
   var _devtools = / /;
   _devtools.toString = function(){ 
