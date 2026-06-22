@@ -397,8 +397,8 @@ document.addEventListener('touchstart', function requestOnTouch() {
           <input type="text" id="bairro" placeholder="Bairro *" style="flex:1" oninput="calcularEntrega()">
           <input type="text" id="cidade" placeholder="Cidade" style="flex:1">
         </div>
-        <input type="text" id="complemento" placeholder="Complemento" style="margin-bottom:8px">
-        <input type="text" id="referencia" placeholder="Ponto de referência">
+        <input type="text" id="complemento" placeholder="Complemento" style="margin-bottom:8px" maxlength="200">
+        <input type="text" id="referencia" placeholder="Ponto de referência" maxlength="200">
       </div>
       <div style="margin-bottom:16px">
         <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#a1a1a1;cursor:pointer">
@@ -1210,8 +1210,8 @@ function submitOrder() {
   numero = sanitizarTexto(limitarTexto(numero, 20));
   bairro = sanitizarTexto(limitarTexto(bairro, 100));
   cidade = sanitizarTexto(limitarTexto(cidade, 100));
-  complemento = sanitizarTexto(limitarTexto(complemento, 100));
-  referencia = sanitizarTexto(limitarTexto(referencia, 100));
+  complemento = sanitizarTexto(limitarTexto(complemento, 200));
+  referencia = sanitizarTexto(limitarTexto(referencia, 200));
   obs = sanitizarTexto(limitarTexto(obs, 250));
 
   contadorPedidos++; localStorage.setItem('contadorPedidos', contadorPedidos);
