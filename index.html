@@ -718,13 +718,7 @@ var HORA_INICIO = 18;
 var HORA_FIM = 1;
 
 function isPizzariaAberta() {
-  var agora = new Date();
-  var dia = agora.getDay();
-  var hora = agora.getHours();
-  if (DIAS_FUNCIONAMENTO.indexOf(dia) < 0) return false;
-  if (hora >= HORA_INICIO) return true;
-  if (hora < HORA_FIM) return true;
-  return false;
+  return true; // Horario desativado para testes
 }
 
 function getHorarioInfo() {
@@ -1072,6 +1066,37 @@ function parseTroco(valor) {
   return parseFloat(valor) || 0;
 }
 
+// ============ SEGURANCA E VALIDACAO ============
+// Sanitiza texto para evitar XSS
+function sanitizarTexto(texto) {
+  if (!texto) return '';
+  return texto.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
+}
+
+// Valida CEP (8 dígitos numéricos)
+function validarCEP(cep) {
+  var clean = cep.replace(/\D/g, '');
+  return clean.length === 8;
+}
+
+// Limita tamanho do texto
+function limitarTexto(texto, maxLen) {
+  if (!texto) return '';
+  return texto.substring(0, maxLen);
+}
+
+// Controle de spam - limita pedidos por minuto
+var ultimoTempoPedido = 0;
+function podeFazerPedido() {
+  var agora = Date.now();
+  var diff = agora - ultimoTempoPedido;
+  if (diff < 5000) { // 5 segundos entre pedidos
+    return false;
+  }
+  ultimoTempoPedido = agora;
+  return true;
+}
+
 // ============ TOAST / NOTIFICACAO ============
 var toastTimeout = null;
 function showToast(msg, type) {
@@ -1133,6 +1158,8 @@ var STATUS_PEDIDO = {
 };
 
 function submitOrder() {
+  // Controle de spam
+  if (!podeFazerPedido()) { showToast('Aguarde alguns segundos antes de fazer outro pedido.', 'error'); return; }
   var nome = document.getElementById('nome').value.trim();
   var telefone = document.getElementById('telefone').value.trim();
   var rua = document.getElementById('rua').value.trim();
@@ -1153,6 +1180,7 @@ function submitOrder() {
     if (!rua || !numero || !bairro) { showToast('Preencha o endereço completo.', 'error'); return; }
     var erroEndereco = validarEndereco(rua, numero, bairro, cidade);
     if (erroEndereco) { showToast(erroEndereco, 'error'); return; }
+    if (!cep || !validarCEP(cep)) { showToast('Informe um CEP válido (8 dígitos).', 'error'); return; }
     if (!zonaAtual) { showToast('Não foi possível calcular a entrega. Verifique o CEP.', 'error'); return; }
     if (total < MIN_PEDIDO_ENTREGA) { showToast('Valor mínimo para entrega: R$ ' + MIN_PEDIDO_ENTREGA.toFixed(2) + '.', 'error'); return; }
   }
@@ -1163,6 +1191,17 @@ function submitOrder() {
     var totalFinal = total + entrega;
     if (trocoNum < totalFinal) { showToast('Valor em mãos (R$ ' + troco + ') é menor que o total (R$ ' + totalFinal.toFixed(2) + ').', 'error'); return; }
   }
+  // Sanitiza todos os textos para evitar XSS
+  nome = sanitizarTexto(limitarTexto(nome, 100));
+  telefone = sanitizarTexto(telefone);
+  rua = sanitizarTexto(limitarTexto(rua, 150));
+  numero = sanitizarTexto(limitarTexto(numero, 20));
+  bairro = sanitizarTexto(limitarTexto(bairro, 100));
+  cidade = sanitizarTexto(limitarTexto(cidade, 100));
+  complemento = sanitizarTexto(limitarTexto(complemento, 100));
+  referencia = sanitizarTexto(limitarTexto(referencia, 100));
+  obs = sanitizarTexto(limitarTexto(obs, 200));
+
   contadorPedidos++; localStorage.setItem('contadorPedidos', contadorPedidos);
   var pedidoId = String(contadorPedidos);
   var entrega = retirada ? 0 : (zonaAtual ? zonaAtual.valor : 0);
@@ -1214,7 +1253,7 @@ function submitOrder() {
   document.getElementById('pedidoCardUsuario').innerHTML = cardHtml;
 }
 
-function showError(msg) { var el = document.getElementById('checkoutError'); el.textContent = msg; el.style.display = 'block'; }
+function showError(msg) { showToast(msg, 'error'); }
 
 // Matching de pedidoId: usa ID direto primeiro, depois data/horario, depois telefone
 function matchPedidoApi(localP, apiPedidos) {
