@@ -114,7 +114,56 @@
     .status-retirou { background: rgba(245,158,11,.2); color: #f59e0b; }
     .status-entregue { background: rgba(34,197,94,.2); color: #22c55e; }
     .status-cancelado { background: rgba(107,114,128,.2); color: #6b7280; }
+    .toast {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100%);
+      z-index: 9999;
+      padding: 14px 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      max-width: 90%;
+      text-align: center;
+      transition: transform 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0,0,0,.5);
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(16px);
+    }
+    .toast-error {
+      background: rgba(248,113,113,.95);
+      color: #fff;
+      border: 1px solid rgba(248,113,113,.5);
+    }
+    .toast-success {
+      background: rgba(74,222,128,.95);
+      color: #000;
+      border: 1px solid rgba(74,222,128,.5);
+    }
+    .toast-info {
+      background: rgba(88,28,135,.95);
+      color: #fff;
+      border: 1px solid rgba(168,85,247,.5);
+    }
+    .toast button {
+      display: block;
+      margin: 10px auto 0;
+      padding: 8px 20px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255,255,255,.2);
+      color: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+    }
   </style>
+  <div id="toast" class="toast">
+    <div id="toastMsg"></div>
+    <button onclick="hideToast()">OK</button>
+  </div>
 
 <script>
 // ============ NOTIFICACOES (global) ============
@@ -1023,6 +1072,36 @@ function parseTroco(valor) {
   return parseFloat(valor) || 0;
 }
 
+// ============ TOAST / NOTIFICACAO ============
+var toastTimeout = null;
+function showToast(msg, type) {
+  var toast = document.getElementById('toast');
+  var toastMsg = document.getElementById('toastMsg');
+  if (!toast || !toastMsg) return;
+  toast.className = 'toast toast-' + (type || 'error');
+  toastMsg.textContent = msg;
+  toast.classList.add('show');
+  // Auto-esconde após 5s
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(function() { hideToast(); }, 5000);
+}
+function hideToast() {
+  var toast = document.getElementById('toast');
+  if (toast) toast.classList.remove('show');
+  if (toastTimeout) clearTimeout(toastTimeout);
+}
+// Valida telefone brasileiro (10 ou 11 digitos, DDD valido)
+function validarTelefone(tel) {
+  var clean = tel.replace(/\D/g, '');
+  if (clean.length < 10 || clean.length > 11) return false;
+  // DDD nao pode ser 00
+  var ddd = clean.substring(0, 2);
+  if (ddd === '00') return false;
+  // Celular com 9 na frente: o primeiro digito do numero nao pode ser 0
+  if (clean.length === 11 && clean[2] === '0') return false;
+  return true;
+}
+
 var STATUS_PEDIDO = {
   recebido: { nome: 'Recebido', class: 'recebido', icon: '📥' },
   confirmado: { nome: 'Confirmado', class: 'confirmado', icon: '✅' },
@@ -1048,20 +1127,20 @@ function submitOrder() {
   var pay = document.querySelector('.pay-btn.active') ? document.querySelector('.pay-btn.active').dataset.pay : 'dinheiro';
   var troco = document.getElementById('troco').value.trim();
   var total = 0; for (var i = 0; i < cart.length; i++) total += cart[i].preco * cart[i].qty;
-  if (!nome || nome.trim().split(/\s+/).length < 2) { showError('Informe nome e sobrenome.'); return; }
+  if (!nome || nome.trim().split(/\s+/).length < 2) { showToast('Informe nome e sobrenome.', 'error'); return; }
   var telClean = telefone.replace(/\D/g,'');
-  if (telClean.length < 10 || telClean.length > 11) { showError('Informe um telefone valido com DDD.'); return; }
+  if (!validarTelefone(telefone)) { showToast('Informe um telefone válido com DDD (ex: 19 99999-9999).', 'error'); return; }
   if (!retirada) {
-    if (!rua || !numero || !bairro) { showError('Preencha o endereco completo.'); return; }
-    if (!zonaAtual) { showError('Nao foi possivel calcular a entrega.'); return; }
-    if (total < MIN_PEDIDO_ENTREGA) { showError('Valor minimo para entrega e R$ ' + MIN_PEDIDO_ENTREGA.toFixed(2) + '.'); return; }
+    if (!rua || !numero || !bairro) { showToast('Preencha o endereço completo.', 'error'); return; }
+    if (!zonaAtual) { showToast('Não foi possível calcular a entrega. Verifique o CEP.', 'error'); return; }
+    if (total < MIN_PEDIDO_ENTREGA) { showToast('Valor mínimo para entrega: R$ ' + MIN_PEDIDO_ENTREGA.toFixed(2) + '.', 'error'); return; }
   }
-  if (pay === 'dinheiro' && !troco) { showError('Informe o valor para calcular o troco.'); return; }
+  if (pay === 'dinheiro' && !troco) { showToast('Informe o valor em mãos para calcular o troco.', 'error'); return; }
   if (pay === 'dinheiro' && troco) {
     var trocoNum = parseTroco(troco);
     var entrega = retirada ? 0 : (zonaAtual ? zonaAtual.valor : 0);
     var totalFinal = total + entrega;
-    if (trocoNum < totalFinal) { showError('Valor em mãos (R$ ' + troco + ') é menor que o total (R$ ' + totalFinal.toFixed(2) + ').'); return; }
+    if (trocoNum < totalFinal) { showToast('Valor em mãos (R$ ' + troco + ') é menor que o total (R$ ' + totalFinal.toFixed(2) + ').', 'error'); return; }
   }
   contadorPedidos++; localStorage.setItem('contadorPedidos', contadorPedidos);
   var pedidoId = String(contadorPedidos);
