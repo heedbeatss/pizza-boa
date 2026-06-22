@@ -442,7 +442,8 @@ document.addEventListener('touchstart', function requestOnTouch() {
       </div>
       <div class="form-group">
         <label>📝 Observação</label>
-        <textarea id="obs" rows="2" placeholder="Ex: sem cebola..."></textarea>
+        <textarea id="obs" rows="2" placeholder="Ex: sem cebola..." maxlength="250" oninput="contarCaracteres(this, 'obsCount')"></textarea>
+        <div id="obsCount" style="font-size:11px;color:#a1a1a1;text-align:right;margin-top:4px">0/250</div>
       </div>
       <div id="checkoutSummary"></div>
       <button class="submit-btn" onclick="submitOrder()">Confirmar Pedido</button>
@@ -1118,9 +1119,13 @@ function hideToast() {
 // Formata campo de numero (aceita numeros, S/N, sn)
 function formatarNumero(input) {
   var valor = input.value.toUpperCase().replace(/[^0-9SN]/g, '');
-  // Limita a 10 caracteres
   if (valor.length > 10) valor = valor.substring(0, 10);
   input.value = valor;
+}
+// Contador de caracteres para observacao
+function contarCaracteres(input, countId) {
+  var count = document.getElementById(countId);
+  if (count) count.textContent = input.value.length + '/250';
 }
 // Valida telefone brasileiro (10 ou 11 digitos, DDD valido)
 function validarTelefone(tel) {
@@ -1207,7 +1212,7 @@ function submitOrder() {
   cidade = sanitizarTexto(limitarTexto(cidade, 100));
   complemento = sanitizarTexto(limitarTexto(complemento, 100));
   referencia = sanitizarTexto(limitarTexto(referencia, 100));
-  obs = sanitizarTexto(limitarTexto(obs, 200));
+  obs = sanitizarTexto(limitarTexto(obs, 250));
 
   contadorPedidos++; localStorage.setItem('contadorPedidos', contadorPedidos);
   var pedidoId = String(contadorPedidos);
