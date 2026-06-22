@@ -713,9 +713,7 @@ function normalizarItens(categorias) {
   return categorias;
 }
 
-var DIAS_FUNCIONAMENTO = [0, 2, 3, 4, 5, 6];
-var HORA_INICIO = 18;
-var HORA_FIM = 1;
+var DIAS_FUNCIONAMENTO = [0, 2, 3, 4, 5, 6]; // Dom, Ter, Qua, Qui, Sex, Sab (Segunda fechado)
 
 function isPizzariaAberta() {
   var agora = new Date();
@@ -731,9 +729,9 @@ function getHorarioInfo() {
   var agora = new Date();
   var dia = agora.getDay();
   var hora = agora.getHours();
-  var nomes = ['Domingo','Segunda','Terca','Quarta','Quinta','Sexta','Sabado'];
-  if (DIAS_FUNCIONAMENTO.indexOf(dia) < 0) return 'Hoje e ' + nomes[dia] + '. Fechados. Terca a Domingo, ' + HORA_INICIO + 'h-' + HORA_FIM + 'h.';
-  if (hora >= HORA_FIM && hora < HORA_INICIO) return 'Ainda nao abrimos. Hoje abrimos as ' + HORA_INICIO + 'h.';
+  var nomes = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+  if (DIAS_FUNCIONAMENTO.indexOf(dia) < 0) return 'Hoje é ' + nomes[dia] + '. Abrimos de Terça a Domingo, ' + HORA_INICIO + 'h-' + HORA_FIM + 'h.';
+  if (hora >= HORA_FIM && hora < HORA_INICIO) return 'Ainda não abrimos. Hoje abrimos às ' + HORA_INICIO + 'h.';
   return 'Estamos abertos!';
 }
 
