@@ -391,7 +391,7 @@ document.addEventListener('touchstart', function requestOnTouch() {
         </div>
         <div class="form-row" style="margin-bottom:8px">
           <input type="text" id="rua" placeholder="Rua *" style="flex:2" oninput="calcularEntrega()">
-          <input type="text" id="numero" placeholder="Nº *" style="flex:1">
+          <input type="text" id="numero" placeholder="Nº *" style="flex:1" oninput="formatarNumero(this)">
         </div>
         <div class="form-row" style="margin-bottom:8px">
           <input type="text" id="bairro" placeholder="Bairro *" style="flex:1" oninput="calcularEntrega()">
@@ -1114,6 +1114,13 @@ function hideToast() {
   var toast = document.getElementById('toast');
   if (toast) toast.classList.remove('show');
   if (toastTimeout) clearTimeout(toastTimeout);
+}
+// Formata campo de numero (aceita numeros, S/N, sn)
+function formatarNumero(input) {
+  var valor = input.value.toUpperCase().replace(/[^0-9SN]/g, '');
+  // Limita a 10 caracteres
+  if (valor.length > 10) valor = valor.substring(0, 10);
+  input.value = valor;
 }
 // Valida telefone brasileiro (10 ou 11 digitos, DDD valido)
 function validarTelefone(tel) {
