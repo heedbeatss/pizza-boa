@@ -1411,7 +1411,8 @@ function matchPedidoApi(localP, apiPedidos) {
   return null;
 }
 
-function carregarPedidos() {aPedidos') || '[]');
+function carregarPedidos() {
+  var pedidos = JSON.parse(localStorage.getItem('pizzaPedidos') || '[]');
   // Filtra apenas os pedidos feitos neste dispositivo
   var meusPedidos = pedidos.filter(function(p) { return p && p.deviceId === deviceId; });
   var emAndamento = meusPedidos.filter(function(p) { return p.status && p.status !== 'entregue' && p.status !== 'retirou' && p.status !== 'cancelado'; });
