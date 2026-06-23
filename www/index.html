@@ -167,6 +167,8 @@
 
 <script>
 // ============ NOTIFICACOES (global) ============
+var ONGOING_NOTIFICATION_ID = 100;
+
 async function requestNotificationPermission() {
   if (window.Capacitor && window.Capacitor.isNativePlatform()) {
     // Android/iOS: usa plugin nativo
@@ -184,6 +186,54 @@ async function requestNotificationPermission() {
   }
 }
 
+// Ongoing notification: fixa na barra, atualiza conforme status muda
+async function updateOngoingNotification(pedido) {
+  if (!window.Capacitor || !window.Capacitor.isNativePlatform()) {
+    // Web: usa Notification API normal
+    var st = STATUS_PEDIDO[pedido.status] || STATUS_PEDIDO.recebido;
+    fallbackWebNotification('🍕 Pedido ' + st.nome, 'Status: ' + st.nome + ' • R$ ' + (pedido.totalFinal||0).toFixed(2), 'ongoing-' + (pedido.deviceId || 'default'));
+    return;
+  }
+  try {
+    const { LocalNotifications } = await import('@capacitor/local-notifications');
+    var st = STATUS_PEDIDO[pedido.status] || STATUS_PEDIDO.recebido;
+    var bodyLines = [];
+    bodyLines.push('Status: ' + st.icon + ' ' + st.nome);
+    if (pedido.itens) {
+      var itensStr = pedido.itens.map(function(i){ return i.qty + 'x ' + i.nome; }).join(', ');
+      bodyLines.push(itensStr);
+    }
+    bodyLines.push('Total: R$ ' + (pedido.totalFinal||0).toFixed(2));
+    await LocalNotifications.schedule({
+      notifications: [{
+        id: ONGOING_NOTIFICATION_ID,
+        title: '🍕 Pedido ' + st.icon + ' ' + st.nome,
+        body: bodyLines.join('\n'),
+        ongoing: true,
+        smallIcon: 'ic_launcher_foreground',
+        iconColor: '#581c87',
+        extra: { pedidoId: pedido.id || '', status: pedido.status || 'recebido' }
+      }]
+    });
+    console.log('[Ongoing] Atualizado:', st.nome);
+  } catch(e) {
+    console.warn('[Ongoing] Erro:', e.message);
+  }
+}
+
+// Cancela ongoing notification quando pedido e finalizado
+async function cancelOngoingNotification() {
+  if (!window.Capacitor || !window.Capacitor.isNativePlatform()) return;
+  try {
+    const { LocalNotifications } = await import('@capacitor/local-notifications');
+    await LocalNotifications.cancel({ notifications: [{ id: ONGOING_NOTIFICATION_ID }] });
+    console.log('[Ongoing] Cancelada');
+  } catch(e) {
+    console.warn('[Ongoing] Erro ao cancelar:', e.message);
+  }
+}
+
+// Notificacao pontual (para web ou eventos unicos fora o ciclo do pedido)
 async function sendNotification(title, body, tag) {
   // Tenta sempre tocar som
   playNotificationSound();
@@ -491,7 +541,7 @@ document.addEventListener('touchstart', function requestOnTouch() {
       <h2>Pedido Confirmado!</h2>
       <p>Seu pedido foi recebido com sucesso!</p>
       <div id="pedidoCardUsuario" style="margin:16px 0;text-align:left"></div>
-      <a id="waLink" href="#" target="_blank" class="whatsapp-btn">📱 Confirmar pelo WhatsApp</a><br>
+      <a id="waLink" href="#" onclick="enviarWhatsApp();return false;" class="whatsapp-btn">📱 Confirmar pelo WhatsApp</a><br>
       <button class="back-btn" onclick="showHome()">Voltar ao Início</button>
     </div>
   </div>
@@ -581,45 +631,58 @@ var usandoAPI = false;
 var apiPedidoId = null;
 
 async function fetchAPI(action, params, body, signal) {
-  try {
-    var url = new URL(API_URL);
-    url.searchParams.set('action', action);
-    if (params) {
-      for (var k in params) { url.searchParams.set(k, params[k]); }
-    }
-    var opts = { method: body ? 'POST' : 'GET', headers: body ? {'Content-Type': 'text/plain'} : {} };
-    if (body) {
-      opts.body = JSON.stringify(body);
-    }
-    if (signal) opts.signal = signal;
-    if (body) opts.mode = 'no-cors';
-    console.log('[DEBUG] fetchAPI url:', url.toString());
-    var res = await fetch(url.toString(), opts);
-    console.log('[DEBUG] fetchAPI status:', res.status, 'ok:', res.ok, 'type:', res.type, 'url:', res.url);
-    if (opts.mode === 'no-cors') {
-      apiDisponivel = true;
-      return { ok: true, data: {} };
-    }
-    if (res.status === 0 || res.type === 'opaque') {
-      console.warn('[API] Resposta opaca (CORS/redirect)');
+  return new Promise(function(resolve) {
+    try {
+      var url = API_URL + '?action=' + encodeURIComponent(action);
+      if (params) {
+        for (var k in params) { url += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }
+      }
+      var xhr = new XMLHttpRequest();
+      xhr.open(body ? 'POST' : 'GET', url, true);
+      xhr.timeout = 10000;
+      if (body) {
+        xhr.setRequestHeader('Content-Type', 'text/plain');
+      }
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          console.log('[DEBUG]XHR status:', xhr.status, 'response:', xhr.responseText.substring(0, 100));
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              var data = JSON.parse(xhr.responseText);
+              apiDisponivel = true;
+              resolve({ ok: true, data: data });
+            } catch(e) {
+              console.warn('[API] Parse error:', e.message);
+              apiDisponivel = false;
+              resolve({ ok: false, error: 'parse' });
+            }
+          } else {
+            console.warn('[API] HTTP error:', xhr.status);
+            apiDisponivel = false;
+            resolve({ ok: false, error: 'http_' + xhr.status });
+          }
+        }
+      };
+      xhr.ontimeout = function() {
+        console.warn('[API] Timeout');
+        apiDisponivel = false;
+        resolve({ ok: false, error: 'timeout' });
+      };
+      xhr.onerror = function() {
+        console.warn('[API] Network error');
+        apiDisponivel = false;
+        resolve({ ok: false, error: 'network' });
+      };
+      if (signal) {
+        signal.addEventListener('abort', function() { xhr.abort(); });
+      }
+      xhr.send(body ? JSON.stringify(body) : null);
+    } catch(e) {
+      console.warn('[API] Exception:', e.message);
       apiDisponivel = false;
-      return { ok: false, error: 'opaque' };
+      resolve({ ok: false, error: e.message });
     }
-    var text = await res.text();
-    console.log('[DEBUG] fetchAPI response:', text.substring(0, 200));
-    if (text.indexOf('<!DOCTYPE') >= 0 || text.indexOf('<html') >= 0) {
-      console.warn('[API] Recebeu HTML em vez de JSON - possivel login redirect');
-      apiDisponivel = false;
-      return { ok: false, error: 'html_response' };
-    }
-    var data = JSON.parse(text);
-    apiDisponivel = true;
-    return { ok: true, data: data };
-  } catch(e) {
-    console.warn('[API] Falha:', e.message);
-    apiDisponivel = false;
-    return { ok: false, error: e.message };
-  }
+  });
 }
 
 async function carregarCardapioAPI() {
@@ -1223,6 +1286,17 @@ var STATUS_PEDIDO = {
   cancelado: { nome: 'Cancelado', class: 'cancelado', icon: '❌' }
 };
 
+function enviarWhatsApp() {
+  var link = document.getElementById('waLink');
+  if (!link || link.href === '#') return;
+  var url = link.href;
+  if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+    window.open(url, '_system');
+  } else {
+    window.location.href = url;
+  }
+}
+
 function submitOrder() {
   // Controle de spam
   if (!podeFazerPedido()) { showToast('Aguarde alguns segundos antes de fazer outro pedido.', 'error'); return; }
@@ -1303,8 +1377,8 @@ function submitOrder() {
   document.getElementById('checkoutSuccess').style.display = 'block';
   document.getElementById('pedidoNum').textContent = '';
   document.getElementById('waLink').href = 'https://wa.me/19984356289?text=' + encodeURIComponent(msg);
-  // Notificacao de pedido realizado
-  sendNotification('🍕 Pedido Realizado!', 'Seu pedido foi recebido. Total: R$ ' + totalFinal.toFixed(2), 'pedido-' + pedidoId);
+  // Cria ongoing notification do pedido
+  updateOngoingNotification(pedido);
   var cardHtml = '<div style="background:#1a1a1a;border-radius:12px;padding:16px;border-left:3px solid #581c87">';
   cardHtml += '<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#f59e0b;font-size:13px">📥 Recebido</span></div>';
   cardHtml += '<div style="font-size:13px;color:#a1a1a1;margin-bottom:8px">';
@@ -1321,58 +1395,65 @@ function submitOrder() {
 
 function showError(msg) { showToast(msg, 'error'); }
 
-// Matching de pedidoId: usa ID direto primeiro, depois data/horario, depois telefone
+// Matching de pedidoId: usa ID direto primeiro, depois data/horario, depois telefone+nome+dia
 function matchPedidoApi(localP, apiPedidos) {
   if (!apiPedidos || apiPedidos.length === 0) return null;
-  // 1) Tenta match por ID direto (mais confiavel)
+  // 1) Tenta match por ID direto
   var matchId = apiPedidos.find(function(a) { return String(a.id) === String(localP.id); });
   if (matchId) {
     console.log('[MATCH] Encontrou por ID:', localP.id);
     return matchId;
   }
-  // 2) Tenta match por data/horario exato (ISO timestamp)
+  // 2) Tenta match por data/horario com tolerancia de 5s
   if (localP.data) {
-    var matchData = apiPedidos.find(function(a) { return a.data && a.data === localP.data; });
-    if (matchData) {
-      console.log('[MATCH] Encontrou por data exata:', localP.data);
-      return matchData;
-    }
-    // 2b) Tenta match por data com tolerancia de 2s
     var localTime = new Date(localP.data).getTime();
     var matchProx = apiPedidos.find(function(a) {
       if (!a.data) return false;
       var apiTime = new Date(a.data).getTime();
-      return Math.abs(apiTime - localTime) < 2000;
+      return Math.abs(apiTime - localTime) < 5000;
     });
     if (matchProx) {
       console.log('[MATCH] Encontrou por data aproximada:', localP.data, '~', matchProx.data);
       return matchProx;
     }
   }
-  // 3) Fallback: telefone + mesmo dia
-  if (localP.telefone) {
+  // 3) Fallback: telefone + nome + mesmo dia + proximidade (±60s)
+  if (localP.telefone && localP.nome && localP.data) {
     var telLocal = localP.telefone.replace(/\D/g, '');
-    var diaLocal = localP.data ? localP.data.substring(0, 10) : null;
-    if (diaLocal) {
-      var candidatos = apiPedidos.filter(function(a) {
-        if (!a.telefone) return false;
-        var telApi = a.telefone.replace(/\D/g, '');
-        var diaApi = a.data ? a.data.substring(0, 10) : null;
-        return telApi === telLocal && diaApi === diaLocal;
-      });
-      if (candidatos.length >= 1) {
-        console.log('[MATCH] Encontrou por telefone+dia:', telLocal, diaLocal, candidatos.length, 'candidato(s)');
-        if (candidatos.length === 1) return candidatos[0];
-        if (localP.data) {
-          candidatos.sort(function(a, b) {
-            return Math.abs(new Date(a.data) - new Date(localP.data)) - Math.abs(new Date(b.data) - new Date(localP.data));
-          });
-        }
-        return candidatos[0];
-      }
+    var nomeLocal = localP.nome.trim().toLowerCase();
+    var diaLocal = localP.data.substring(0, 10);
+    var localTime = new Date(localP.data).getTime();
+    var candidatos = apiPedidos.filter(function(a) {
+      if (!a.telefone || !a.nome || !a.data) return false;
+      if (a.telefone.replace(/\D/g, '') !== telLocal) return false;
+      if (a.nome.trim().toLowerCase() !== nomeLocal) return false;
+      if (a.data.substring(0, 10) !== diaLocal) return false;
+      return Math.abs(new Date(a.data).getTime() - localTime) < 60000;
+    });
+    if (candidatos.length >= 1) {
+      candidatos.sort(function(a, b) { return Math.abs(new Date(a.data).getTime() - localTime) - Math.abs(new Date(b.data).getTime() - localTime); });
+      console.log('[MATCH] Encontrou por tel+nome+dia (±60s):', candidatos.length, 'candidatos');
+      return candidatos[0];
     }
   }
-  console.log('[MATCH] NAO encontrou match para:', localP.id, localP.data, localP.telefone);
+  // 4) Ultimo fallback: telefone + mesmo dia (sem nome) + proximidade (±60s)
+  if (localP.telefone && localP.data) {
+    var telLocal2 = localP.telefone.replace(/\D/g, '');
+    var diaLocal2 = localP.data.substring(0, 10);
+    var localTime2 = new Date(localP.data).getTime();
+    var candidatos2 = apiPedidos.filter(function(a) {
+      if (!a.telefone || !a.data) return false;
+      if (a.telefone.replace(/\D/g, '') !== telLocal2) return false;
+      if (a.data.substring(0, 10) !== diaLocal2) return false;
+      return Math.abs(new Date(a.data).getTime() - localTime2) < 60000;
+    });
+    if (candidatos2.length >= 1) {
+      candidatos2.sort(function(a, b) { return Math.abs(new Date(a.data).getTime() - localTime2) - Math.abs(new Date(b.data).getTime() - localTime2); });
+      console.log('[MATCH] Encontrou por tel+dia (±60s):', candidatos2.length, 'candidatos');
+      return candidatos2[0];
+    }
+  }
+  console.log('[MATCH] NAO encontrou match para:', localP.id, localP.data, localP.telefone, localP.nome);
   return null;
 }
 
@@ -1452,13 +1533,18 @@ function carregarPedidos() {
         localStorage.setItem('contadorPedidos', contadorPedidos);
         // Atualiza localStorage com o merge
         localStorage.setItem('pizzaPedidos', JSON.stringify(merged));
-        // Detecta mudanca de status para saiu_entrega e notifica
+        // Atualiza ongoing notification conforme status do pedido
         var statusAnterior = JSON.parse(localStorage.getItem('pizzaPedidosStatus') || '{}');
         for (var m = 0; m < meusAtualizados.length; m++) {
           var pedidoAtual = meusAtualizados[m];
           var statusAnt = statusAnterior[pedidoAtual.id];
-          if (statusAnt && statusAnt !== 'saiu_entrega' && pedidoAtual.status === 'saiu_entrega') {
-            sendNotification('🛵 Saiu para Entrega!', 'Seu pedido saiu para entrega!', 'saiu-entrega-' + pedidoAtual.id);
+          // Atualiza ongoing notification para qualquer mudanca de status
+          if (statusAnt && statusAnt !== pedidoAtual.status) {
+            updateOngoingNotification(pedidoAtual);
+          }
+          // Cancela ongoing quando pedido e finalizado
+          if (['entregue','cancelado','retirou'].indexOf(pedidoAtual.status) >= 0 && statusAnt && statusAnt !== pedidoAtual.status) {
+            cancelOngoingNotification();
           }
         }
         // Salva status atuais para proxima comparacao
