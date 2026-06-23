@@ -581,7 +581,6 @@ var usandoAPI = false;
 var apiPedidoId = null;
 
 async function fetchAPI(action, params, body, signal) {
-async function fetchAPI(action, params, body, signal) {
   try {
     var url = new URL(API_URL);
     url.searchParams.set('action', action);
