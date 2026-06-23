@@ -575,90 +575,31 @@ var usandoAPI = false;
 var apiPedidoId = null;
 
 async function fetchAPI(action, params, body, signal) {
-  return new Promise(function(resolve) {
-    try {
-      var url = API_URL + '?action=' + encodeURIComponent(action);
-      if (params) {
-        for (var k in params) { url += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }
-      }
-      var xhr = new XMLHttpRequest();
-      xhr.open(body ? 'POST' : 'GET', url, true);
-      xhr.timeout = 10000;
-      if (body) {
-        xhr.setRequestHeader('Content-Type', 'text/plain');
-      }
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-          if (xhr.status >= 200 && xhr.status < 300) {
-            try {
-              var data = JSON.parse(xhr.responseText);
-              apiDisponivel = true;
-              resolve({ ok: true, data: data });
-            } catch(e) {
-              console.warn('[API] Parse error:', e.message);
-              apiDisponivel = false;
-              resolve({ ok: false, error: 'parse_error' });
-            }
-          } else if (xhr.status === 0 || xhr.status === 302) {
-            console.warn('[API] Status', xhr.status, '- tentando fallback');
-            fetchAPIFallback(action, params, body).then(resolve);
-          } else {
-            console.warn('[API] HTTP error:', xhr.status);
-            apiDisponivel = false;
-            resolve({ ok: false, error: 'http_' + xhr.status });
-          }
-        }
-      };
-      xhr.ontimeout = function() {
-        console.warn('[API] Timeout');
-        apiDisponivel = false;
-        resolve({ ok: false, error: 'timeout' });
-      };
-      xhr.onerror = function() {
-        console.warn('[API] Network error');
-        apiDisponivel = false;
-        resolve({ ok: false, error: 'network' });
-      };
-      if (signal) {
-        signal.addEventListener('abort', function() { xhr.abort(); });
-      }
-      xhr.send(body ? JSON.stringify(body) : null);
-    } catch(e) {
-      console.warn('[API] Exception:', e.message);
-      apiDisponivel = false;
-      resolve({ ok: false, error: e.message });
+  try {
+    var url = new URL(API_URL);
+    url.searchParams.set('action', action);
+    if (params) {
+      for (var k in params) { url.searchParams.set(k, params[k]); }
     }
-  });
-}
-
-function fetchAPIFallback(action, params, body) {
-  return new Promise(function(resolve) {
-    try {
-      var iframe = document.getElementById('apiFallbackFrame');
-      if (!iframe) {
-        iframe = document.createElement('iframe');
-        iframe.id = 'apiFallbackFrame';
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
-      }
-      var url = API_URL + '?action=' + encodeURIComponent(action);
-      if (params) {
-        for (var k in params) { url += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }
-      }
-      iframe.src = url;
-      var timeout = setTimeout(function() {
-        apiDisponivel = true;
-        resolve({ ok: true, data: {} });
-      }, 3000);
-      iframe.onload = function() {
-        clearTimeout(timeout);
-        apiDisponivel = true;
-        resolve({ ok: true, data: {} });
-      };
-    } catch(e) {
-      resolve({ ok: false, error: e.message });
+    var opts = { method: body ? 'POST' : 'GET', headers: body ? {'Content-Type': 'text/plain'} : {} };
+    if (body) {
+      opts.body = JSON.stringify(body);
     }
-  });
+    if (signal) opts.signal = signal;
+    if (body) opts.mode = 'no-cors';
+    var res = await fetch(url.toString(), opts);
+    if (opts.mode === 'no-cors') {
+      apiDisponivel = true;
+      return { ok: true, data: {} };
+    }
+    var data = await res.json();
+    apiDisponivel = true;
+    return { ok: true, data: data };
+  } catch(e) {
+    console.warn('[API] Falha:', e.message);
+    apiDisponivel = false;
+    return { ok: false, error: e.message };
+  }
 }
 
 async function carregarCardapioAPI() {
