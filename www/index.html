@@ -593,12 +593,17 @@ async function fetchAPI(action, params, body, signal) {
     }
     if (signal) opts.signal = signal;
     if (body) opts.mode = 'no-cors';
+    console.log('[DEBUG] fetchAPI url:', url.toString());
+    console.log('[DEBUG] fetchAPI opts:', JSON.stringify(opts));
     var res = await fetch(url.toString(), opts);
+    console.log('[DEBUG] fetchAPI status:', res.status, 'ok:', res.ok, 'type:', res.type);
     if (opts.mode === 'no-cors') {
       apiDisponivel = true;
       return { ok: true, data: {} };
     }
-    var data = await res.json();
+    var text = await res.text();
+    console.log('[DEBUG] fetchAPI response:', text.substring(0, 200));
+    var data = JSON.parse(text);
     apiDisponivel = true;
     return { ok: true, data: data };
   } catch(e) {
@@ -612,8 +617,10 @@ async function carregarCardapioAPI() {
   try {
     var controller = new AbortController();
     var timeout = setTimeout(function() { controller.abort(); }, 5000);
+    console.log('[DEBUG] carregarCardapioAPI - iniciando');
     var r = await fetchAPI('cardapio', null, null, controller.signal);
     clearTimeout(timeout);
+    console.log('[DEBUG] carregarCardapioAPI - resultado:', JSON.stringify(r).substring(0, 300));
     if (r.ok && r.data && r.data.categorias && r.data.categorias.length > 0) {
       return r.data.categorias;
     }
