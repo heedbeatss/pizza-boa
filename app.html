@@ -167,12 +167,46 @@
 
 <script>
 // ============ NOTIFICACOES (global) ============
-function requestNotificationPermission() {
-  if ('Notification' in window && Notification.permission === 'default') {
-    Notification.requestPermission();
+async function requestNotificationPermission() {
+  if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+    try {
+      const { LocalNotifications } = await import('@capacitor/local-notifications');
+      await LocalNotifications.requestPermissions();
+    } catch(e) {
+      console.warn('[Notification] Erro permissao nativa:', e.message);
+    }
+  } else {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
   }
 }
-function sendNotification(title, body, tag) {
+
+async function sendNotification(title, body, tag) {
+  playNotificationSound();
+
+  if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+    try {
+      const { LocalNotifications } = await import('@capacitor/local-notifications');
+      await LocalNotifications.schedule({
+        notifications: [{
+          id: tag ? tag.charCodeAt(0) * 1000 + Date.now() % 1000 : Date.now(),
+          title: title,
+          body: body,
+          smallIcon: 'ic_launcher_foreground',
+          iconColor: '#581c87',
+        }]
+      });
+    } catch(e) {
+      console.warn('[Notification] Erro nativa:', e.message);
+      fallbackWebNotification(title, body, tag);
+    }
+  } else {
+    fallbackWebNotification(title, body, tag);
+  }
+}
+
+function fallbackWebNotification(title, body, tag) {
   if ('Notification' in window && Notification.permission === 'granted') {
     try {
       new Notification(title, {
@@ -183,11 +217,9 @@ function sendNotification(title, body, tag) {
         vibrate: [200, 100, 200]
       });
     } catch(e) {
-      console.warn('[Notification] Erro:', e.message);
+      console.warn('[Notification] Erro web:', e.message);
     }
   }
-  // Toca som de notificacao (funciona no Android com PWA instalado)
-  playNotificationSound();
 }
 
 var audioCtx = null;

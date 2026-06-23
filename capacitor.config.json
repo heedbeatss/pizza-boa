@@ -1,0 +1,26 @@
+{
+  "appId": "com.pizzaboa.app",
+  "appName": "Pizza Boa",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#0a0a0a"
+  },
+  "plugins": {
+    "StatusBar": {
+      "style": "light",
+      "backgroundColor": "#0a0a0a"
+    },
+    "SplashScreen": {
+      "launchAutoHide": true,
+      "backgroundColor": "#0a0a0a",
+      "showSpinner": false
+    },
+    "Keyboard": {
+      "resize": "body",
+      "resizeOnFullScreen": true
+    }
+  }
+}
