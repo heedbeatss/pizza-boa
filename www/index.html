@@ -1398,62 +1398,32 @@ function showError(msg) { showToast(msg, 'error'); }
 // Matching de pedidoId: usa ID direto primeiro, depois data/horario, depois telefone+nome+dia
 function matchPedidoApi(localP, apiPedidos) {
   if (!apiPedidos || apiPedidos.length === 0) return null;
-  // 1) Tenta match por ID direto
   var matchId = apiPedidos.find(function(a) { return String(a.id) === String(localP.id); });
-  if (matchId) {
-    console.log('[MATCH] Encontrou por ID:', localP.id);
-    return matchId;
-  }
-  // 2) Tenta match por data/horario com tolerancia de 5s
+  if (matchId) return matchId;
   if (localP.data) {
     var localTime = new Date(localP.data).getTime();
     var matchProx = apiPedidos.find(function(a) {
       if (!a.data) return false;
-      var apiTime = new Date(a.data).getTime();
-      return Math.abs(apiTime - localTime) < 5000;
+      return Math.abs(new Date(a.data).getTime() - localTime) < 5000;
     });
-    if (matchProx) {
-      console.log('[MATCH] Encontrou por data aproximada:', localP.data, '~', matchProx.data);
-      return matchProx;
-    }
+    if (matchProx) return matchProx;
   }
-  // 3) Fallback: telefone + nome + mesmo dia + proximidade (±60s)
   if (localP.telefone && localP.nome && localP.data) {
     var telLocal = localP.telefone.replace(/\D/g, '');
     var nomeLocal = localP.nome.trim().toLowerCase();
-    var diaLocal = localP.data.substring(0, 10);
     var localTime = new Date(localP.data).getTime();
     var candidatos = apiPedidos.filter(function(a) {
       if (!a.telefone || !a.nome || !a.data) return false;
+      if (a.status === 'entregue' || a.status === 'retirou' || a.status === 'cancelado') return false;
       if (a.telefone.replace(/\D/g, '') !== telLocal) return false;
       if (a.nome.trim().toLowerCase() !== nomeLocal) return false;
-      if (a.data.substring(0, 10) !== diaLocal) return false;
-      return Math.abs(new Date(a.data).getTime() - localTime) < 60000;
+      return Math.abs(new Date(a.data).getTime() - localTime) < 30000;
     });
     if (candidatos.length >= 1) {
       candidatos.sort(function(a, b) { return Math.abs(new Date(a.data).getTime() - localTime) - Math.abs(new Date(b.data).getTime() - localTime); });
-      console.log('[MATCH] Encontrou por tel+nome+dia (±60s):', candidatos.length, 'candidatos');
       return candidatos[0];
     }
   }
-  // 4) Ultimo fallback: telefone + mesmo dia (sem nome) + proximidade (±60s)
-  if (localP.telefone && localP.data) {
-    var telLocal2 = localP.telefone.replace(/\D/g, '');
-    var diaLocal2 = localP.data.substring(0, 10);
-    var localTime2 = new Date(localP.data).getTime();
-    var candidatos2 = apiPedidos.filter(function(a) {
-      if (!a.telefone || !a.data) return false;
-      if (a.telefone.replace(/\D/g, '') !== telLocal2) return false;
-      if (a.data.substring(0, 10) !== diaLocal2) return false;
-      return Math.abs(new Date(a.data).getTime() - localTime2) < 60000;
-    });
-    if (candidatos2.length >= 1) {
-      candidatos2.sort(function(a, b) { return Math.abs(new Date(a.data).getTime() - localTime2) - Math.abs(new Date(b.data).getTime() - localTime2); });
-      console.log('[MATCH] Encontrou por tel+dia (±60s):', candidatos2.length, 'candidatos');
-      return candidatos2[0];
-    }
-  }
-  console.log('[MATCH] NAO encontrou match para:', localP.id, localP.data, localP.telefone, localP.nome);
   return null;
 }
 
@@ -1475,7 +1445,7 @@ function carregarPedidos() {
     var p = emAndamento[i]; var st = STATUS_PEDIDO[p.status] || STATUS_PEDIDO.recebido;
     h += '<div class="pedido-card ' + st.class + '" style="margin-bottom:12px">';
     h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="status-badge ' + st.class + '">' + st.icon + ' ' + st.nome + '</span></div>';
-    h += '<div style="font-size:12px;color:#a1a1a1;margin-bottom:8px">' + new Date(p.data).toLocaleString('pt-BR') + '</div>';
+    h += '<div style="font-size:12px;color:#a1a1a1;margin-bottom:8px">' + (p.nome ? '👤 ' + p.nome + ' • ' : '') + new Date(p.data).toLocaleString('pt-BR') + '</div>';
     h += '<div style="font-size:13px;margin-bottom:4px">';
     if (p.itens) { for (var j = 0; j < p.itens.length; j++) { h += '• ' + p.itens[j].qty + 'x ' + p.itens[j].nome + ' (' + p.itens[j].tamanho + ')<br>'; } }
     h += '</div>';
