@@ -1252,9 +1252,11 @@ var STATUS_PEDIDO = {
 };
 
 function enviarWhatsApp() {
-  var link = document.getElementById('waLink');
-  if (!link || link.href === '#') return;
-  var url = link.href;
+  var nome = document.getElementById('nome').value.trim();
+  var telefone = document.getElementById('telefone').value.trim();
+  if (!nome || !telefone) { alert('Preencha nome e telefone primeiro!'); return; }
+  var msg = '🍕 Novo Pedido - Cliente: ' + nome + ' | Tel: ' + telefone;
+  var url = 'https://wa.me/19984356289?text=' + encodeURIComponent(msg);
   if (window.Capacitor && window.Capacitor.isNativePlatform()) {
     window.open(url, '_system');
   } else {
