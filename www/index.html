@@ -594,15 +594,24 @@ async function fetchAPI(action, params, body, signal) {
     if (signal) opts.signal = signal;
     if (body) opts.mode = 'no-cors';
     console.log('[DEBUG] fetchAPI url:', url.toString());
-    console.log('[DEBUG] fetchAPI opts:', JSON.stringify(opts));
     var res = await fetch(url.toString(), opts);
-    console.log('[DEBUG] fetchAPI status:', res.status, 'ok:', res.ok, 'type:', res.type);
+    console.log('[DEBUG] fetchAPI status:', res.status, 'ok:', res.ok, 'type:', res.type, 'url:', res.url);
     if (opts.mode === 'no-cors') {
       apiDisponivel = true;
       return { ok: true, data: {} };
     }
+    if (res.status === 0 || res.type === 'opaque') {
+      console.warn('[API] Resposta opaca (CORS/redirect)');
+      apiDisponivel = false;
+      return { ok: false, error: 'opaque' };
+    }
     var text = await res.text();
     console.log('[DEBUG] fetchAPI response:', text.substring(0, 200));
+    if (text.indexOf('<!DOCTYPE') >= 0 || text.indexOf('<html') >= 0) {
+      console.warn('[API] Recebeu HTML em vez de JSON - possivel login redirect');
+      apiDisponivel = false;
+      return { ok: false, error: 'html_response' };
+    }
     var data = JSON.parse(text);
     apiDisponivel = true;
     return { ok: true, data: data };
