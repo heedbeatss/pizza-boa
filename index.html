@@ -451,7 +451,7 @@ document.addEventListener('touchstart', function requestOnTouch() {
     <div id="checkoutSuccess" class="success-screen" style="display:none">
       <div class="emoji">🎉</div>
       <h2>Pedido Confirmado!</h2>
-      <p>Pedido <strong id="pedidoNum"></strong></p>
+      <p>Seu pedido foi recebido com sucesso!</p>
       <div id="pedidoCardUsuario" style="margin:16px 0;text-align:left"></div>
       <a id="waLink" href="#" target="_blank" class="whatsapp-btn">📱 Confirmar pelo WhatsApp</a><br>
       <button class="back-btn" onclick="showHome()">Voltar ao Início</button>
@@ -1229,7 +1229,7 @@ function submitOrder() {
     enviarPedidoForm(pedidoAPI);
   }
 
-  var msg = '🍕 *NOVO PEDIDO* - ' + pedidoId + '%0A%0A👤 *Cliente:* ' + nome + '%0A📱 *Telefone:* ' + telefone + '%0A%0A';
+  var msg = '🍕 *NOVO PEDIDO*%0A%0A👤 *Cliente:* ' + nome + '%0A📱 *Telefone:* ' + telefone + '%0A%0A';
   if (retirada) { msg += '🏪 *RETIRADA NA PIZZARIA*%0A%0A'; } else { msg += '🛵 *Entrega*' + '%0A%0A'; }
   msg += '📦 *Itens:*%0A';
   for (var i = 0; i < cart.length; i++) { var it = cart[i]; msg += '• ' + it.qty + 'x ' + it.nome + ' (' + it.tamanho + ') - R$ ' + (it.preco * it.qty).toFixed(2) + '%0A'; }
@@ -1247,12 +1247,12 @@ function submitOrder() {
   document.getElementById('checkoutForm').style.display = 'none';
   document.getElementById('retiradaToggle').style.display = 'none';
   document.getElementById('checkoutSuccess').style.display = 'block';
-  document.getElementById('pedidoNum').textContent = pedidoId;
+  document.getElementById('pedidoNum').textContent = '';
   document.getElementById('waLink').href = 'https://wa.me/19984356289?text=' + encodeURIComponent(msg);
   // Notificacao de pedido realizado
-  sendNotification('🍕 Pedido Realizado!', 'Pedido ' + pedidoId + ' recebido. Total: R$ ' + totalFinal.toFixed(2), 'pedido-' + pedidoId);
+  sendNotification('🍕 Pedido Realizado!', 'Seu pedido foi recebido. Total: R$ ' + totalFinal.toFixed(2), 'pedido-' + pedidoId);
   var cardHtml = '<div style="background:#1a1a1a;border-radius:12px;padding:16px;border-left:3px solid #581c87">';
-  cardHtml += '<div style="display:flex;justify-content:space-between;margin-bottom:8px"><strong>' + pedidoId + '</strong><span style="color:#f59e0b;font-size:13px">📥 Recebido</span></div>';
+  cardHtml += '<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#f59e0b;font-size:13px">📥 Recebido</span></div>';
   cardHtml += '<div style="font-size:13px;color:#a1a1a1;margin-bottom:8px">';
   for (var i = 0; i < pedido.itens.length; i++) { cardHtml += '• ' + pedido.itens[i].qty + 'x ' + pedido.itens[i].nome + ' (' + pedido.itens[i].tamanho + ')<br>'; }
   cardHtml += '</div>';
@@ -1339,7 +1339,7 @@ function carregarPedidos() {
   for (var i = emAndamento.length - 1; i >= 0; i--) {
     var p = emAndamento[i]; var st = STATUS_PEDIDO[p.status] || STATUS_PEDIDO.recebido;
     h += '<div class="pedido-card ' + st.class + '" style="margin-bottom:12px">';
-    h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><strong style="font-size:16px">' + p.id + '</strong><span class="status-badge ' + st.class + '">' + st.icon + ' ' + st.nome + '</span></div>';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="status-badge ' + st.class + '">' + st.icon + ' ' + st.nome + '</span></div>';
     h += '<div style="font-size:12px;color:#a1a1a1;margin-bottom:8px">' + new Date(p.data).toLocaleString('pt-BR') + '</div>';
     h += '<div style="font-size:13px;margin-bottom:4px">';
     if (p.itens) { for (var j = 0; j < p.itens.length; j++) { h += '• ' + p.itens[j].qty + 'x ' + p.itens[j].nome + ' (' + p.itens[j].tamanho + ')<br>'; } }
@@ -1404,7 +1404,7 @@ function carregarPedidos() {
           var pedidoAtual = meusAtualizados[m];
           var statusAnt = statusAnterior[pedidoAtual.id];
           if (statusAnt && statusAnt !== 'saiu_entrega' && pedidoAtual.status === 'saiu_entrega') {
-            sendNotification('🛵 Saiu para Entrega!', 'Pedido ' + pedidoAtual.id + ' saiu para entrega!', 'saiu-entrega-' + pedidoAtual.id);
+            sendNotification('🛵 Saiu para Entrega!', 'Seu pedido saiu para entrega!', 'saiu-entrega-' + pedidoAtual.id);
           }
         }
         // Salva status atuais para proxima comparacao
