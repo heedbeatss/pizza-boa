@@ -1293,7 +1293,7 @@ function enviarWhatsApp() {
   if (window.Capacitor && window.Capacitor.isNativePlatform()) {
     window.open(url, '_system');
   } else {
-    window.location.href = url;
+    window.open(url, '_blank');
   }
 }
 
