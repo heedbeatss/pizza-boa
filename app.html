@@ -187,9 +187,21 @@ async function requestNotificationPermission() {
 // Ongoing notification: fixa na barra, atualiza conforme status muda
 async function updateOngoingNotification(pedido) {
   if (!window.Capacitor || !window.Capacitor.isNativePlatform()) {
-    // Web: usa Notification API normal
+    // Web: notificação com mensagens amigáveis por status
+    var statusMsgs = {
+      recebido: { title: '🍕 Pedido Recebido!', body: 'Seu pedido foi recebido!' },
+      confirmado: { title: '✅ Pedido Confirmado!', body: 'Seu pedido foi confirmado!' },
+      em_preparo: { title: '👨‍🍳 Em Preparo!', body: 'Seu pedido está sendo preparado!' },
+      no_forno: { title: '🔥 No Forno!', body: 'Seu pedido foi para o forno!' },
+      saiu_entrega: { title: '🛵 Saiu para Entrega!', body: 'Seu pedido saiu para entrega!' },
+      retirou: { title: '🏪 Retirado!', body: 'Seu pedido foi retirado!' },
+      entregue: { title: '🎉 Entregue!', body: 'Seu pedido foi entregue!' },
+      cancelado: { title: '❌ Cancelado!', body: 'Seu pedido foi cancelado.' }
+    };
     var st = STATUS_PEDIDO[pedido.status] || STATUS_PEDIDO.recebido;
-    fallbackWebNotification('🍕 Pedido ' + st.nome, 'Status: ' + st.nome + ' • R$ ' + (pedido.totalFinal||0).toFixed(2), 'ongoing-' + (pedido.deviceId || 'default'));
+    var notif = statusMsgs[pedido.status] || { title: '🍕 Pedido ' + st.nome, body: 'Status: ' + st.nome };
+    fallbackWebNotification(notif.title, notif.body, 'status-' + (pedido.status || 'recebido'));
+    playNotificationSound();
     return;
   }
   try {
