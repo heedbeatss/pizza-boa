@@ -310,10 +310,8 @@ function playNotificationSound() {
   var ws = document.getElementById('welcomeScreen');
   if (!ws) return;
   ws.addEventListener('click', function() {
-    // Esconder e abrir app
-    ws.style.transition = 'opacity 0.3s';
-    ws.style.opacity = '0';
-    setTimeout(function() { ws.style.display = 'none'; }, 300);
+    ws.style.display = 'none';
+    ws.remove();
     showHome();
   });
 })();
