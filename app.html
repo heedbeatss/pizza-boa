@@ -307,10 +307,11 @@ function playNotificationSound() {
 }
 // Welcome Screen - Mobile only, pede permissao ao tocar
 document.getElementById('welcomeScreen').addEventListener('click', function() {
-  requestNotificationPermission();
-  document.getElementById('welcomeScreen').style.opacity = '0';
-  document.getElementById('welcomeScreen').style.transition = 'opacity 0.3s';
-  setTimeout(function() { document.getElementById('welcomeScreen').style.display = 'none'; }, 300);
+  try { requestNotificationPermission(); } catch(e) {}
+  var ws = document.getElementById('welcomeScreen');
+  ws.style.transition = 'opacity 0.3s';
+  ws.style.opacity = '0';
+  setTimeout(function() { ws.style.display = 'none'; ws.remove(); }, 350);
   showHome();
 });
 
