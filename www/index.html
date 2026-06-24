@@ -165,6 +165,7 @@
     <button onclick="hideToast()">OK</button>
   </div>
 
+<script src="config.js"></script>
 <script>
 // ============ NOTIFICACOES (global) ============
 var ONGOING_NOTIFICATION_ID = 100;
@@ -190,16 +191,7 @@ async function requestNotificationPermission() {
 async function updateOngoingNotification(pedido) {
   if (!window.Capacitor || !window.Capacitor.isNativePlatform()) {
     // Web: notificação com mensagens amigáveis por status
-    var statusMsgs = {
-      recebido: { title: '🍕 Pedido Recebido!', body: 'Seu pedido foi recebido!' },
-      confirmado: { title: '✅ Pedido Confirmado!', body: 'Seu pedido foi confirmado!' },
-      em_preparo: { title: '👨‍🍳 Em Preparo!', body: 'Seu pedido está sendo preparado!' },
-      no_forno: { title: '🔥 No Forno!', body: 'Seu pedido foi para o forno!' },
-      saiu_entrega: { title: '🛵 Saiu para Entrega!', body: 'Seu pedido saiu para entrega!' },
-      retirou: { title: '🏪 Retirado!', body: 'Seu pedido foi retirado!' },
-      entregue: { title: '🎉 Entregue!', body: 'Seu pedido foi entregue!' },
-      cancelado: { title: '❌ Cancelado!', body: 'Seu pedido foi cancelado.' }
-    };
+    var statusMsgs = APP_CONFIG.msgs;
     var st = STATUS_PEDIDO[pedido.status] || STATUS_PEDIDO.recebido;
     var notif = statusMsgs[pedido.status] || { title: '🍕 Pedido ' + st.nome, body: 'Status: ' + st.nome };
     fallbackWebNotification(notif.title, notif.body, 'status-' + (pedido.status || 'recebido'));
@@ -637,7 +629,7 @@ var CARDAPIO = {
 };
 
 // ============ GOOGLE SHEETS API ============
-var API_URL = 'https://script.google.com/macros/s/AKfycbxnxQ9Hj6hEbmveEPNySjkLYXRMwXIwdhV4TGeiLIJn6uf0evIUPne1X6XFJPimhi5qAQ/exec';
+var API_URL = APP_CONFIG.apiUrl;
 var apiDisponivel = false;
 var usandoAPI = false;
 var apiPedidoId = null;
@@ -865,7 +857,7 @@ var TAXA_FIXA_MOTOBOY = 3.0;
 var TAXA_POR_KM = 1.0;
 var TAXA_MAXIMA = 25.0;
 var MIN_PEDIDO_GRATIS = 100;
-var MIN_PEDIDO_ENTREGA = 30;
+var MIN_PEDIDO_ENTREGA = APP_CONFIG.pedidoMinimo || 30;
 var zonaAtual = null;
 
 var ZONAS_ENTREGA = [
@@ -1303,7 +1295,7 @@ function enviarWhatsApp() {
   var telefone = document.getElementById('telefone').value.trim();
   if (!nome || !telefone) { alert('Preencha nome e telefone primeiro!'); return; }
   var msg = '🍕 Novo Pedido - Cliente: ' + nome + ' | Tel: ' + telefone;
-  var url = 'https://wa.me/19984356289?text=' + encodeURIComponent(msg);
+  var url = 'https://wa.me/' + APP_CONFIG.whatsapp + '?text=' + encodeURIComponent(msg);
   if (window.Capacitor && window.Capacitor.isNativePlatform()) {
     window.open(url, '_system');
   } else {
@@ -1336,7 +1328,7 @@ function submitOrder() {
     if (erroEndereco) { showToast(erroEndereco, 'error'); return; }
     if (!cep || !validarCEP(cep)) { showToast('Informe um CEP válido (8 dígitos).', 'error'); return; }
     if (!zonaAtual) { showToast('Não foi possível calcular a entrega. Verifique o CEP.', 'error'); return; }
-    if (total < MIN_PEDIDO_ENTREGA) { showToast('Valor mínimo para entrega: R$ ' + MIN_PEDIDO_ENTREGA.toFixed(2) + '.', 'error'); return; }
+    if (total < APP_CONFIG.pedidoMinimo) { MIN_PEDIDO_ENTREGA = APP_CONFIG.pedidoMinimo; showToast('Valor mínimo para entrega: R$ ' + MIN_PEDIDO_ENTREGA.toFixed(2) + '.', 'error'); return; }
   }
   if (pay === 'dinheiro' && !troco) { showToast('Informe o valor em mãos para calcular o troco.', 'error'); return; }
   if (pay === 'dinheiro' && troco) {
@@ -1390,7 +1382,7 @@ function submitOrder() {
   document.getElementById('retiradaToggle').style.display = 'none';
   document.getElementById('checkoutSuccess').style.display = 'block';
   document.getElementById('pedidoNum').textContent = '';
-  document.getElementById('waLink').href = 'https://wa.me/19984356289?text=' + encodeURIComponent(msg);
+  document.getElementById('waLink').href = 'https://wa.me/' + APP_CONFIG.whatsapp + '?text=' + encodeURIComponent(msg);
   // Cria ongoing notification do pedido
   updateOngoingNotification(pedido);
   var cardHtml = '<div style="background:#1a1a1a;border-radius:12px;padding:16px;border-left:3px solid #581c87">';
@@ -1544,7 +1536,7 @@ function carregarPedidos() {
   }
 }
 
-function showAdminLogin() { var senha = prompt('Senha admin:'); if (senha === '1234') { document.getElementById('adminPage').style.display = 'block'; document.getElementById('cardapio').style.display = 'none'; document.getElementById('catNavMenu').style.display = 'none'; document.getElementById('checkoutPage').style.display = 'none'; document.getElementById('meusPedidosSection').style.display = 'none'; carregarAdminPedidos(); } }
+function showAdminLogin() { var senha = prompt('Senha admin:'); if (senha === APP_CONFIG.senhaAdmin) { document.getElementById('adminPage').style.display = 'block'; document.getElementById('cardapio').style.display = 'none'; document.getElementById('catNavMenu').style.display = 'none'; document.getElementById('checkoutPage').style.display = 'none'; document.getElementById('meusPedidosSection').style.display = 'none'; carregarAdminPedidos(); } }
 
 var adminPedidosCarregados = false;
 
@@ -1751,6 +1743,11 @@ function showHome() {
 function goBack() { showHome(); }
 
 document.addEventListener('DOMContentLoaded', function() {
+  document.title = APP_CONFIG.nome + ' - ' + APP_CONFIG.slogan;
+  var h1 = document.querySelector("header h1");
+  if (h1) h1.innerHTML = '🍕 ' + APP_CONFIG.nome;
+  var sl = document.querySelector("header p");
+  if (sl) sl.textContent = APP_CONFIG.slogan;
   updateHorarioHeader();
   render();
   updateCartButton();

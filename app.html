@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   <meta name="theme-color" content="#581c87">
-  <title>Pizza Boa - Delivery</title>
+  <title>🍕 Pizza Boa - Delivery</title>
   <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiUGl6emEgQm9hIiwic2hvcnRfbmFtZSI6IlBpenphIEJvYSIsInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjMGEwYTBhIiwidGhlbWVfY29sb3IiOiIjNTgxYzg3IiwiaWNvbnMiOltdfQ==">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -831,7 +831,7 @@ var TAXA_FIXA_MOTOBOY = 3.0;
 var TAXA_POR_KM = 1.0;
 var TAXA_MAXIMA = 25.0;
 var MIN_PEDIDO_GRATIS = 100;
-var MIN_PEDIDO_ENTREGA = 30;
+var MIN_PEDIDO_ENTREGA = APP_CONFIG.pedidoMinimo || 30;
 var zonaAtual = null;
 
 var ZONAS_ENTREGA = [
@@ -1718,6 +1718,11 @@ function showHome() {
 function goBack() { showHome(); }
 
 document.addEventListener('DOMContentLoaded', function() {
+  document.title = APP_CONFIG.nome + ' - ' + APP_CONFIG.slogan;
+  var h1 = document.querySelector("header h1");
+  if (h1) h1.innerHTML = '🍕 ' + APP_CONFIG.nome;
+  var slogan = document.querySelector("header p");
+  if (slogan) slogan.textContent = APP_CONFIG.slogan;
   updateHorarioHeader();
   render();
   updateCartButton();
