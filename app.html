@@ -306,14 +306,17 @@ function playNotificationSound() {
   }
 }
 // Welcome Screen - Mobile only, pede permissao ao tocar
-document.getElementById('welcomeScreen').addEventListener('click', async function() {
-  try { await requestNotificationPermission(); } catch(e) {}
+(function setupWelcome() {
   var ws = document.getElementById('welcomeScreen');
-  ws.style.transition = 'opacity 0.3s';
-  ws.style.opacity = '0';
-  setTimeout(function() { ws.style.display = 'none'; ws.remove(); }, 350);
-  showHome();
-});
+  if (!ws) return; // elemento ainda não existe no DOM
+  ws.addEventListener('click', async function() {
+    try { await requestNotificationPermission(); } catch(e) {}
+    ws.style.transition = 'opacity 0.3s';
+    ws.style.opacity = '0';
+    setTimeout(function() { ws.style.display = 'none'; ws.remove(); }, 350);
+    showHome();
+  });
+})();
 
 // Solicita permissao no mobile (try/catch evita erro no navegador)
 try { requestNotificationPermission(); } catch(e) {}
