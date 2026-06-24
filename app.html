@@ -310,9 +310,7 @@ function playNotificationSound() {
   var ws = document.getElementById('welcomeScreen');
   if (!ws) return;
   ws.addEventListener('click', function() {
-    // Pedir permissão em background (não bloquear)
-    requestNotificationPermission();
-    // Esconder e abrir app imediatamente
+    // Esconder e abrir app
     ws.style.transition = 'opacity 0.3s';
     ws.style.opacity = '0';
     setTimeout(function() { ws.style.display = 'none'; }, 300);
