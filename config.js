@@ -12,6 +12,7 @@ var APP_CONFIG = {
   
   // ============ API ============
   apiUrl: "https://script.google.com/macros/s/AKfycbxnxQ9Hj6hEbmveEPNySjkLYXRMwXIwdhV4TGeiLIJn6uf0evIUPne1X6XFJPimhi5qAQ/exec",
+  sheetId: "1EwtGeTtkl0WcKdl_2UZrZhLAU55xfx0hLAEkn1kN_2M",
   
   // ============ CONTATO ============
   whatsapp: "19984356289",

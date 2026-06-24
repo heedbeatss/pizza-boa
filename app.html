@@ -165,6 +165,7 @@
     <button onclick="hideToast()">OK</button>
   </div>
 
+<script src="config.js"></script>
 <script>
 // ============ NOTIFICACOES (global) ============
 var ONGOING_NOTIFICATION_ID = 100;
@@ -304,6 +305,15 @@ function playNotificationSound() {
     console.warn('[Audio] Erro:', e.message);
   }
 }
+// Welcome Screen - Mobile only, pede permissao ao tocar
+document.getElementById('welcomeScreen').addEventListener('click', function() {
+  requestNotificationPermission();
+  document.getElementById('welcomeScreen').style.opacity = '0';
+  document.getElementById('welcomeScreen').style.transition = 'opacity 0.3s';
+  setTimeout(function() { document.getElementById('welcomeScreen').style.display = 'none'; }, 300);
+  showHome();
+});
+
 // Solicita permissao imediatamente ao carregar + na primeira interacao
 requestNotificationPermission();
 document.addEventListener('click', function requestOnClick() {
@@ -330,6 +340,17 @@ document.addEventListener('touchstart', function requestOnTouch() {
 </script>
 </head>
 <body>
+<div id="welcomeScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#0a0a0a 0%,#1a1a2e 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99999;cursor:pointer">
+  <div style="text-align:center;color:#fff">
+    <div style="font-size:80px;margin-bottom:20px">🍕</div>
+    <h1 style="font-size:28px;margin-bottom:8px;font-weight:600;color:#a855f7" id="welcomeNome">Pizza Boa</h1>
+    <p style="font-size:16px;color:#a1a1a1;margin-bottom:30px" id="welcomeSlogan">Delivery</p>
+    <div style="padding:16px 32px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.4);border-radius:30px;display:inline-block">
+      <span style="color:#a855f7;font-size:14px;font-weight:500">👉 Toque para começar</span>
+    </div>
+    <p style="font-size:12px;color:#666;margin-top:24px">Você será solicitado a permitir notificações<br>para acompanhar seus pedidos</p>
+  </div>
+</div>
 
 <div class="header">
   <div style="display:flex;justify-content:space-between;align-items:center">
