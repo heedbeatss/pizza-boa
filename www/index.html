@@ -1425,8 +1425,7 @@ function showError(msg) { showToast(msg, 'error'); }
 // Matching de pedidoId: usa ID direto primeiro, depois data/horario, depois telefone+nome+dia
 function matchPedidoApi(localP, apiPedidos) {
   if (!apiPedidos || apiPedidos.length === 0) return null;
-  var matchId = apiPedidos.find(function(a) { return String(a.id) === String(localP.id); });
-  if (matchId) return matchId;
+  // 1) Match por data/horario ±5s (mais preciso)
   if (localP.data) {
     var localTime = new Date(localP.data).getTime();
     var matchProx = apiPedidos.find(function(a) {
@@ -1435,19 +1434,23 @@ function matchPedidoApi(localP, apiPedidos) {
     });
     if (matchProx) return matchProx;
   }
+  // 2) Match por nome + telefone + dia (fallback)
   if (localP.telefone && localP.nome && localP.data) {
     var telLocal = localP.telefone.replace(/\D/g, '');
     var nomeLocal = localP.nome.trim().toLowerCase();
-    var localTime = new Date(localP.data).getTime();
+    var diaLocal = localP.data.substring(0, 10);
     var candidatos = apiPedidos.filter(function(a) {
       if (!a.telefone || !a.nome || !a.data) return false;
       if (a.status === 'entregue' || a.status === 'retirou' || a.status === 'cancelado') return false;
       if (a.telefone.replace(/\D/g, '') !== telLocal) return false;
       if (a.nome.trim().toLowerCase() !== nomeLocal) return false;
-      return Math.abs(new Date(a.data).getTime() - localTime) < 30000;
+      if (a.data.substring(0, 10) !== diaLocal) return false;
+      return true;
     });
     if (candidatos.length >= 1) {
-      candidatos.sort(function(a, b) { return Math.abs(new Date(a.data).getTime() - localTime) - Math.abs(new Date(b.data).getTime() - localTime); });
+      candidatos.sort(function(a, b) {
+        return Math.abs(new Date(a.data).getTime() - localTime) - Math.abs(new Date(b.data).getTime() - localTime);
+      });
       return candidatos[0];
     }
   }
