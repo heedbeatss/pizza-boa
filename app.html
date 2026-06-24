@@ -306,18 +306,8 @@ function playNotificationSound() {
   }
 }
 // Welcome Screen - Mobile only, pede permissao ao tocar
-(function setupWelcome() {
-  var ws = document.getElementById('welcomeScreen');
-  if (!ws) return;
-  ws.addEventListener('click', function() {
-    ws.style.display = 'none';
-    ws.remove();
-    showHome();
-  });
-})();
-
-// Permissao sera pedida apenas quando usuario tocar na welcome screen
-// (nao pedimos automaticamente para nao abrir popup antes do usuario interagir)
+// Welcome screen sera configurada no DOMContentLoaded (abaixo)
+// para garantir que o elemento ja exista no DOM
 
 (function(){
   
@@ -1736,6 +1726,15 @@ function showHome() {
 function goBack() { showHome(); }
 
 document.addEventListener('DOMContentLoaded', function() {
+  // Welcome Screen setup (elemento ja existe no DOM neste ponto)
+  var ws = document.getElementById('welcomeScreen');
+  if (ws) {
+    ws.addEventListener('click', function() {
+      ws.style.display = 'none';
+      ws.remove();
+      showHome();
+    });
+  }
   if (typeof APP_CONFIG !== 'undefined') {
     document.title = APP_CONFIG.nome + ' - ' + APP_CONFIG.slogan;
     var h1 = document.querySelector("header h1");
