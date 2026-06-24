@@ -1451,10 +1451,14 @@ function carregarPedidos() {
           var match = matchPedidoApi(p, apiPedidos.filter(function(a) { return idsApiUsados.indexOf(a.id) < 0; }));
           if (match) {
             idsApiUsados.push(match.id);
+            console.log('[MERGE] Local:', p.id, p.nome, p.status, '→ Match:', match.id, match.status);
             // So atualiza se o status for DIFERENTE do local (evita match errado)
             if (match.status && match.status !== p.status) {
+              console.log('[MERGE] Atualizando status:', p.status, '→', match.status);
               return Object.assign({}, p, { id: String(match.id), status: match.status });
             }
+          } else {
+            console.log('[MERGE] Sem match para:', p.id, p.nome, p.status);
           }
           return p;
         });
