@@ -320,16 +320,8 @@ function playNotificationSound() {
   });
 })();
 
-// Solicita permissao no mobile (try/catch evita erro no navegador)
-try { requestNotificationPermission(); } catch(e) {}
-document.addEventListener('click', function requestOnClick() {
-  requestNotificationPermission();
-  document.removeEventListener('click', requestOnClick);
-}, { once: true });
-document.addEventListener('touchstart', function requestOnTouch() {
-  requestNotificationPermission();
-  document.removeEventListener('touchstart', requestOnTouch);
-}, { once: true });
+// Permissao sera pedida apenas quando usuario tocar na welcome screen
+// (nao pedimos automaticamente para nao abrir popup antes do usuario interagir)
 
 (function(){
   
