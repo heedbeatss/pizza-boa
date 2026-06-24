@@ -296,13 +296,13 @@ function playNotificationSound() {
     console.warn('[Audio] Erro:', e.message);
   }
 }
-// Solicita permissao na primeira interacao
+// Solicita permissao na primeira interacao (try/catch evita erro no navegador)
 document.addEventListener('click', function requestOnClick() {
-  requestNotificationPermission();
+  try { requestNotificationPermission(); } catch(e) {}
   document.removeEventListener('click', requestOnClick);
 }, { once: true });
 document.addEventListener('touchstart', function requestOnTouch() {
-  requestNotificationPermission();
+  try { requestNotificationPermission(); } catch(e) {}
   document.removeEventListener('touchstart', requestOnTouch);
 }, { once: true });
 

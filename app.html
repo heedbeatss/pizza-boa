@@ -314,8 +314,8 @@ document.getElementById('welcomeScreen').addEventListener('click', function() {
   showHome();
 });
 
-// Solicita permissao imediatamente ao carregar + na primeira interacao
-requestNotificationPermission();
+// Solicita permissao no mobile (try/catch evita erro no navegador)
+try { requestNotificationPermission(); } catch(e) {}
 document.addEventListener('click', function requestOnClick() {
   requestNotificationPermission();
   document.removeEventListener('click', requestOnClick);
@@ -1740,11 +1740,13 @@ function showHome() {
 function goBack() { showHome(); }
 
 document.addEventListener('DOMContentLoaded', function() {
-  document.title = APP_CONFIG.nome + ' - ' + APP_CONFIG.slogan;
-  var h1 = document.querySelector("header h1");
-  if (h1) h1.innerHTML = '🍕 ' + APP_CONFIG.nome;
-  var slogan = document.querySelector("header p");
-  if (slogan) slogan.textContent = APP_CONFIG.slogan;
+  if (typeof APP_CONFIG !== 'undefined') {
+    document.title = APP_CONFIG.nome + ' - ' + APP_CONFIG.slogan;
+    var h1 = document.querySelector("header h1");
+    if (h1) h1.innerHTML = '🍕 ' + APP_CONFIG.nome;
+    var slogan = document.querySelector("header p");
+    if (slogan) slogan.textContent = APP_CONFIG.slogan;
+  }
   updateHorarioHeader();
   render();
   updateCartButton();
