@@ -1369,17 +1369,22 @@ function showError(msg) { showToast(msg, 'error'); }
 // Matching de pedidoId: usa ID direto primeiro, depois data/horario, depois telefone+nome+dia
 function matchPedidoApi(localP, apiPedidos) {
   if (!apiPedidos || apiPedidos.length === 0) return null;
-  // 1) Match por data/horario ±5s (mais preciso)
-  if (localP.data) {
-    var localTime = new Date(localP.data).getTime();
-    var matchProx = apiPedidos.find(function(a) {
-      if (!a.data) return false;
-      return Math.abs(new Date(a.data).getTime() - localTime) < 5000;
-    });
-    if (matchProx) return matchProx;
-  }
-  // 2) Match por nome + telefone + dia (fallback)
-  if (localP.telefone && localP.nome && localP.data) {
+  if (!localP.data) return null;
+  var localTime = new Date(localP.data).getTime();
+  // 1) Match por data/horario ±5s (strict)
+  var matchProx = apiPedidos.find(function(a) {
+    if (!a.data) return false;
+    return Math.abs(new Date(a.data).getTime() - localTime) < 5000;
+  });
+  if (matchProx) return matchProx;
+  // 2) Match por data/horario ±30s (generous - captura delay do GAS)
+  matchProx = apiPedidos.find(function(a) {
+    if (!a.data) return false;
+    return Math.abs(new Date(a.data).getTime() - localTime) < 30000;
+  });
+  if (matchProx) return matchProx;
+  // 3) Ultimo recurso: nome + telefone + dia
+  if (localP.telefone && localP.nome) {
     var telLocal = localP.telefone.replace(/\D/g, '');
     var nomeLocal = localP.nome.trim().toLowerCase();
     var diaLocal = localP.data.substring(0, 10);
@@ -1388,14 +1393,9 @@ function matchPedidoApi(localP, apiPedidos) {
       if (a.status === 'entregue' || a.status === 'retirou' || a.status === 'cancelado') return false;
       if (a.telefone.replace(/\D/g, '') !== telLocal) return false;
       if (a.nome.trim().toLowerCase() !== nomeLocal) return false;
-      if (a.data.substring(0, 10) !== diaLocal) return false;
-      return true;
+      return a.data.substring(0, 10) === diaLocal;
     });
     if (candidatos.length >= 1) {
-      // Retorna o mais próximo do timestamp local
-      candidatos.sort(function(a, b) {
-        return Math.abs(new Date(a.data).getTime() - localTime) - Math.abs(new Date(b.data).getTime() - localTime);
-      });
       return candidatos[0];
     }
   }
