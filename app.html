@@ -306,8 +306,8 @@ function playNotificationSound() {
   }
 }
 // Welcome Screen - Mobile only, pede permissao ao tocar
-document.getElementById('welcomeScreen').addEventListener('click', function() {
-  try { requestNotificationPermission(); } catch(e) {}
+document.getElementById('welcomeScreen').addEventListener('click', async function() {
+  try { await requestNotificationPermission(); } catch(e) {}
   var ws = document.getElementById('welcomeScreen');
   ws.style.transition = 'opacity 0.3s';
   ws.style.opacity = '0';
