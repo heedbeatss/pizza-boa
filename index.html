@@ -1451,11 +1451,10 @@ function carregarPedidos() {
           var match = matchPedidoApi(p, apiPedidos.filter(function(a) { return idsApiUsados.indexOf(a.id) < 0; }));
           if (match) {
             idsApiUsados.push(match.id);
-            // Se o ID da API e diferente do local, atualiza
-            if (String(match.id) !== String(p.id)) {
-              return Object.assign({}, p, { id: String(match.id), status: match.status || p.status });
+            // So atualiza se o status for DIFERENTE do local (evita match errado)
+            if (match.status && match.status !== p.status) {
+              return Object.assign({}, p, { id: String(match.id), status: match.status });
             }
-            return Object.assign({}, p, { status: match.status || p.status });
           }
           return p;
         });
