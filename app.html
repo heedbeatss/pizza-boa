@@ -308,12 +308,14 @@ function playNotificationSound() {
 // Welcome Screen - Mobile only, pede permissao ao tocar
 (function setupWelcome() {
   var ws = document.getElementById('welcomeScreen');
-  if (!ws) return; // elemento ainda não existe no DOM
-  ws.addEventListener('click', async function() {
-    try { await requestNotificationPermission(); } catch(e) {}
+  if (!ws) return;
+  ws.addEventListener('click', function() {
+    // Pedir permissão em background (não bloquear)
+    requestNotificationPermission();
+    // Esconder e abrir app imediatamente
     ws.style.transition = 'opacity 0.3s';
     ws.style.opacity = '0';
-    setTimeout(function() { ws.style.display = 'none'; ws.remove(); }, 350);
+    setTimeout(function() { ws.style.display = 'none'; }, 300);
     showHome();
   });
 })();
