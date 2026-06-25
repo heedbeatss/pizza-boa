@@ -165,23 +165,55 @@
     <button onclick="hideToast()">OK</button>
   </div>
 
+<script src="capacitor.js"></script>
 <script src="config.js"></script>
 <script>
 // ============ NOTIFICACOES (global) ============
 var ONGOING_NOTIFICATION_ID = 100;
 
+// Inicializa o plugin LocalNotifications via registerPlugin nativo do Capacitor
+// Isso precede qualquer chamada ao plugin no codigo JS principal
+(function initLocalNotificationsPlugin() {
+  if (window.Capacitor && typeof window.Capacitor.registerPlugin === 'function') {
+    window.Capacitor.registerPlugin('LocalNotifications', {
+      web: function() {
+        return {
+          requestPermissions: function() { return window.Capacitor.nativePromise('LocalNotifications', 'requestPermissions', {}); },
+          schedule: function(opts) { return window.Capacitor.nativePromise('LocalNotifications', 'schedule', opts); },
+          cancel: function(opts) { return window.Capacitor.nativePromise('LocalNotifications', 'cancel', opts); },
+        };
+      }
+    });
+    console.log('[Plugin] LocalNotifications registrado via registerPlugin');
+  } else {
+    console.warn('[Plugin] Capacitor.registerPlugin nao disponivel');
+  }
+})();
+
+function getLocalNotifications() {
+  // Capacitor 6: plugin registrado globalmente via registerPlugin
+  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) {
+    return window.Capacitor.Plugins.LocalNotifications;
+  }
+  return null;
+}
+
 async function requestNotificationPermission() {
   // Retomar AudioContext (necessario para beep no Android WebView)
   try {
-    if (typeof audioCtx !== 'undefined' && audioCtx && audioCtx.state === 'suspended') {
+    if (audioCtx && audioCtx.state === 'suspended') {
       await audioCtx.resume();
     }
   } catch(e) {}
   if (window.Capacitor && window.Capacitor.isNativePlatform()) {
-    // Android/iOS: usa plugin nativo
+    // Android/iOS: usa plugin nativo via registro global
     try {
-      const { LocalNotifications } = await import('@capacitor/local-notifications');
-      await LocalNotifications.requestPermissions();
+      const LN = getLocalNotifications();
+      if (LN) {
+        await LN.requestPermissions();
+      } else {
+        console.warn('[Notification] Plugin LocalNotifications nao registrado');
+      }
     } catch(e) {
       console.warn('[Notification] Erro permissao nativa:', e.message);
     }
@@ -205,7 +237,11 @@ async function updateOngoingNotification(pedido) {
     return;
   }
   try {
-    const { LocalNotifications } = await import('@capacitor/local-notifications');
+    var LN = getLocalNotifications();
+    if (!LN) {
+      console.warn('[Ongoing] Plugin nao registrado');
+      return;
+    }
     var st = STATUS_PEDIDO[pedido.status] || STATUS_PEDIDO.recebido;
     var bodyLines = [];
     bodyLines.push('Status: ' + st.icon + ' ' + st.nome);
@@ -214,7 +250,7 @@ async function updateOngoingNotification(pedido) {
       bodyLines.push(itensStr);
     }
     bodyLines.push('Total: R$ ' + (pedido.totalFinal||0).toFixed(2));
-    await LocalNotifications.schedule({
+    await LN.schedule({
       notifications: [{
         id: ONGOING_NOTIFICATION_ID,
         title: '🍕 Pedido ' + st.icon + ' ' + st.nome,
@@ -235,8 +271,9 @@ async function updateOngoingNotification(pedido) {
 async function cancelOngoingNotification() {
   if (!window.Capacitor || !window.Capacitor.isNativePlatform()) return;
   try {
-    const { LocalNotifications } = await import('@capacitor/local-notifications');
-    await LocalNotifications.cancel({ notifications: [{ id: ONGOING_NOTIFICATION_ID }] });
+    var LN = getLocalNotifications();
+    if (!LN) return;
+    await LN.cancel({ notifications: [{ id: ONGOING_NOTIFICATION_ID }] });
     console.log('[Ongoing] Cancelada');
   } catch(e) {
     console.warn('[Ongoing] Erro ao cancelar:', e.message);
@@ -310,15 +347,7 @@ function playNotificationSound() {
 }
 // Welcome Screen sera configurada no DOMContentLoaded (abaixo)
 
-// Solicita permissao na primeira interacao (try/catch evita erro no navegador)
-document.addEventListener('click', function requestOnClick() {
-  try { requestNotificationPermission(); } catch(e) {}
-  document.removeEventListener('click', requestOnClick);
-}, { once: true });
-document.addEventListener('touchstart', function requestOnTouch() {
-  try { requestNotificationPermission(); } catch(e) {}
-  document.removeEventListener('touchstart', requestOnTouch);
-}, { once: true });
+// Welcome Screen sera configurada no DOMContentLoaded (abaixo)
 
 (function(){
   
@@ -1405,7 +1434,8 @@ function submitOrder() {
   if (pedidoNumEl) pedidoNumEl.textContent = '';
   var waLinkEl = document.getElementById('waLink');
   if (waLinkEl) waLinkEl.href = 'https://wa.me/' + APP_CONFIG.whatsapp + '?text=' + encodeURIComponent(msg);
-  // Cria ongoing notification do pedido
+  // Cria ongoing notification do pedido + som
+  playNotificationSound();
   updateOngoingNotification(pedido);
   var cardHtml = '<div style="background:#1a1a1a;border-radius:12px;padding:16px;border-left:3px solid #581c87">';
   cardHtml += '<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#f59e0b;font-size:13px">📥 Recebido</span></div>';
@@ -1535,21 +1565,27 @@ function carregarPedidos() {
         localStorage.setItem('contadorPedidos', contadorPedidos);
         // Atualiza localStorage com o merge
         localStorage.setItem('pizzaPedidos', JSON.stringify(merged));
-        // Atualiza ongoing notification conforme status do pedido
-        var statusAnterior = JSON.parse(localStorage.getItem('pizzaPedidosStatus') || '{}');
-        for (var m = 0; m < meusAtualizados.length; m++) {
-          var pedidoAtual = meusAtualizados[m];
-          var statusAnt = statusAnterior[pedidoAtual.id];
-          // Atualiza ongoing notification para qualquer mudanca de status
-          if (statusAnt && statusAnt !== pedidoAtual.status) {
-            updateOngoingNotification(pedidoAtual);
+          // Atualiza ongoing notification conforme status do pedido
+          var statusAnterior = JSON.parse(localStorage.getItem('pizzaPedidosStatus') || '{}');
+          var qtdNotificacoes = 0;
+          for (var m = 0; m < meusAtualizados.length; m++) {
+            var pedidoAtual = meusAtualizados[m];
+            var statusAnt = statusAnterior[pedidoAtual.id];
+            // So notifica se o status da API for diferente do que ja temos localmente
+            // Isso evita notificacoes duplicadas quando o status ja foi atualizado
+            if (statusAnt && statusAnt !== pedidoAtual.status) {
+              // Incrementa contador para limitar a 1 notificacao por mudanca de status
+              if (qtdNotificacoes === 0) {
+                updateOngoingNotification(pedidoAtual);
+                qtdNotificacoes++;
+              }
+            }
+            // Cancela ongoing quando pedido e finalizado
+            if (['entregue','cancelado','retirou'].indexOf(pedidoAtual.status) >= 0 && statusAnt && statusAnt !== pedidoAtual.status) {
+              cancelOngoingNotification();
+            }
           }
-          // Cancela ongoing quando pedido e finalizado
-          if (['entregue','cancelado','retirou'].indexOf(pedidoAtual.status) >= 0 && statusAnt && statusAnt !== pedidoAtual.status) {
-            cancelOngoingNotification();
-          }
-        }
-        // Salva status atuais para proxima comparacao
+          // Salva status atuais para proxima comparacao
         var novosStatus = {};
         for (var s = 0; s < meusAtualizados.length; s++) {
           novosStatus[meusAtualizados[s].id] = meusAtualizados[s].status;
@@ -1775,12 +1811,17 @@ document.addEventListener('DOMContentLoaded', function() {
   if (ws) {
     ws.addEventListener('click', function() {
       console.log('[WELCOME] Click recebido!');
-      // Retomar AudioContext para permitir beeps
+      // Criar AudioContext e retomar para permitir beeps
       try {
-        if (typeof audioCtx !== 'undefined' && audioCtx && audioCtx.state === 'suspended') {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
           audioCtx.resume();
         }
       } catch(e) {}
+      // Solicitar permissao de notificacao no momento do clique (Android 13+)
+      try { requestNotificationPermission(); } catch(e) {}
       ws.style.display = 'none';
       ws.remove();
       showHome();
