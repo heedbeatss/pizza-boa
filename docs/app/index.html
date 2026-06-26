@@ -1,0 +1,1977 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#581c87">
+  <title>Pizza Boa - Delivery</title>
+  <link rel="icon" type="image/x-icon" href="icons/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+  <link rel="mask-icon" href="icons/mask-icon.svg" color="#581c87">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    html { overflow-y: auto; }
+    body { background: #0a0a0a; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-height: 100vh; overflow-y: auto; }
+    .header { position: sticky; top: 0; z-index: 50; background: rgba(10,10,10,.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(88,28,135,.3); padding: 12px 16px; }
+    .header h1 { font-size: 20px; font-weight: 700; color: #a855f7; }
+    .header p { font-size: 12px; color: #a1a1a1; }
+    .header .badge { font-size: 11px; color: #a1a1a1; background: #1a1a1a; padding: 4px 12px; border-radius: 20px; }
+    .cat-nav { position: sticky; top: 57px; z-index: 40; background: rgba(10,10,10,.95); border-bottom: 1px solid rgba(88,28,135,.2); padding: 12px 16px; overflow-x: auto; }
+    .cat-nav::-webkit-scrollbar { display: none; }
+    .cat-nav-inner { display: flex; gap: 8px; min-width: max-content; }
+    .cat-btn { padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 500; white-space: nowrap; border: none; cursor: pointer; }
+    .cat-btn.active { background: #581c87; color: #fff; }
+    .cat-btn:not(.active) { background: #1a1a1a; color: #a1a1a1; }
+    .section { padding: 24px 16px; scroll-margin-top: 110px; }
+    .section-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+    .item-card { background: #1a1a1a; border-radius: 16px; padding: 16px; margin-bottom: 12px; border: 1px solid rgba(88,28,135,.1); cursor: pointer; }
+    .item-card:hover { background: rgba(88,28,135,.15); }
+    .item-card h3 { font-weight: 600; font-size: 15px; }
+    .item-card p { font-size: 13px; color: #a1a1a1; margin-top: 4px; }
+    .item-card .price { color: #a855f7; font-weight: 700; font-size: 18px; margin-top: 12px; }
+    .modal-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,.7); display: none; align-items: flex-end; justify-content: center; }
+    .modal { width: 100%; max-width: 500px; background: #1a1a1a; border-radius: 24px 24px 0 0; max-height: 90vh; overflow-y: auto; }
+    .modal-handle { display: flex; justify-content: center; padding: 12px 0 4px; }
+    .modal-handle div { width: 40px; height: 4px; background: #581c87; border-radius: 2px; }
+    .modal-content { padding: 0 20px 24px; }
+    .modal-header { display: flex; justify-content: space-between; align-items: flex-start; margin: 8px 0 16px; }
+    .modal-header h2 { font-size: 20px; font-weight: 700; }
+    .modal-header p { font-size: 13px; color: #a1a1a1; margin-top: 4px; }
+    .modal-close { background: none; border: none; color: #a1a1a1; font-size: 20px; padding: 4px; cursor: pointer; }
+    .label { font-size: 13px; font-weight: 600; color: #a855f7; margin-bottom: 8px; display: block; }
+    .size-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 20px; }
+    .size-btn { padding: 12px 8px; border-radius: 12px; text-align: center; border: none; cursor: pointer; font-size: 13px; }
+    .size-btn.active { background: #581c87; color: #fff; }
+    .size-btn:not(.active) { background: #0a0a0a; color: #a1a1a1; }
+    .size-btn .slices { font-size: 11px; opacity: .7; }
+    .size-btn .price { color: #a855f7; font-weight: 700; margin-top: 4px; display: block; }
+    .toggle-row { display: flex; gap: 8px; margin-bottom: 20px; }
+    .toggle-btn { flex: 1; padding: 12px; border-radius: 12px; text-align: center; border: none; cursor: pointer; font-size: 14px; }
+    .toggle-btn.active { background: #581c87; color: #fff; }
+    .toggle-btn:not(.active) { background: #0a0a0a; color: #a1a1a1; }
+    .sabor-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; max-height: 200px; overflow-y: auto; margin-bottom: 16px; }
+    .sabor-btn { padding: 10px 12px; border-radius: 8px; text-align: left; border: none; cursor: pointer; font-size: 13px; display: flex; justify-content: space-between; }
+    .sabor-btn.active { background: #581c87; color: #fff; }
+    .sabor-btn:not(.active) { background: #0a0a0a; color: #a1a1a1; }
+    .qty-row { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 20px; }
+    .qty-btn { width: 40px; height: 40px; border-radius: 50%; border: none; font-size: 20px; font-weight: 700; cursor: pointer; }
+    .qty-btn.minus { background: #0a0a0a; color: #a855f7; }
+    .qty-btn.plus { background: #581c87; color: #fff; }
+    .qty-val { font-size: 24px; font-weight: 700; width: 48px; text-align: center; }
+    .add-btn { width: 100%; padding: 16px; border-radius: 16px; background: #581c87; color: #fff; font-weight: 700; font-size: 18px; border: none; cursor: pointer; }
+    .add-btn:disabled { opacity: .5; cursor: not-allowed; }
+    .cart-btn { position: fixed; bottom: 0; left: 0; right: 0; z-index: 40; padding: 16px; background: linear-gradient(to top, #0a0a0a, transparent); }
+    .cart-btn button { width: 100%; padding: 16px; border-radius: 16px; background: #581c87; color: #fff; font-weight: 700; font-size: 18px; border: none; cursor: pointer; display: flex; justify-content: space-between; }
+    .cart-item { background: #0a0a0a; border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .cart-item-info { flex: 1; }
+    .cart-item-info .name { font-weight: 500; font-size: 14px; }
+    .cart-item-info .price { color: #a855f7; font-weight: 700; font-size: 13px; margin-top: 4px; }
+    .cart-summary { background: #0a0a0a; border-radius: 12px; padding: 16px; margin: 16px 0; }
+    .cart-summary-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 4px; }
+    .cart-summary-row .lbl { color: #a1a1a1; }
+    .cart-summary-total { border-top: 1px solid rgba(88,28,135,.3); padding-top: 8px; margin-top: 8px; font-weight: 700; font-size: 18px; display: flex; justify-content: space-between; }
+    .cart-summary-total .val { color: #a855f7; }
+    .free-delivery { color: #4ade80; }
+    .checkout-section { padding: 16px; padding-bottom: 40px; }
+    .checkout-section h2 { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { font-size: 13px; font-weight: 600; color: #a855f7; margin-bottom: 6px; display: block; }
+    .form-group input, .form-group textarea { width: 100%; padding: 14px; border-radius: 12px; background: #1a1a1a; color: #fff; border: 1px solid rgba(88,28,135,.2); font-size: 14px; outline: none; }
+    .form-group input:focus { border-color: #581c87; }
+    .form-row { display: grid; grid-template-columns: 2fr 1fr; gap: 8px; }
+    .pay-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .pay-btn { padding: 12px 8px; border-radius: 12px; text-align: center; border: none; cursor: pointer; font-size: 13px; white-space: normal; word-wrap: break-word; }
+    .pay-btn.active { background: #581c87; color: #fff; }
+    .pay-btn:not(.active) { background: #1a1a1a; color: #a1a1a1; }
+    .submit-btn { width: 100%; padding: 16px; border-radius: 16px; background: #581c87; color: #fff; font-weight: 700; font-size: 18px; border: none; cursor: pointer; margin-top: 16px; }
+    .error-msg { color: #f87171; font-size: 13px; text-align: center; background: rgba(248,113,113,.1); padding: 12px; border-radius: 12px; margin-bottom: 16px; }
+    .success-screen { text-align: center; padding: 40px 20px; }
+    .success-screen .emoji { font-size: 64px; margin-bottom: 16px; }
+    .success-screen h2 { font-size: 24px; font-weight: 700; color: #4ade80; margin-bottom: 8px; }
+    .success-screen p { color: #a1a1a1; margin-bottom: 24px; }
+    .whatsapp-btn { display: inline-block; padding: 14px 28px; border-radius: 12px; background: #25d366; color: #fff; font-weight: 700; text-decoration: none; font-size: 16px; }
+    .back-btn { display: inline-block; padding: 14px 28px; border-radius: 12px; background: #581c87; color: #fff; font-weight: 700; text-decoration: none; font-size: 16px; margin-top: 12px; border: none; cursor: pointer; }
+    .zona-box { padding: 10px 12px; border-radius: 10px; margin-bottom: 8px; display: none; }
+    .zona-ok { background: rgba(88,28,135,.15); border: 1px solid rgba(88,28,135,.3); }
+    .zona-erro { background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.3); }
+    .zona-row { display: flex; justify-content: space-between; align-items: center; }
+    .metade-info { background: rgba(88,28,135,.1); border-radius: 12px; padding: 12px; margin-bottom: 16px; }
+    .metade-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+    .cat-label { font-size: 12px; color: #a855f7; margin-bottom: 6px; font-weight: 600; }
+    .pedido-card { background: #1a1a1a; border-radius: 12px; padding: 14px; margin-bottom: 10px; border-left: 3px solid #581c87; }
+    .pedido-card.recebido { border-left-color: #f59e0b; }
+    .pedido-card.confirmado { border-left-color: #3b82f6; }
+    .pedido-card.em_preparo { border-left-color: #f97316; }
+    .pedido-card.no_forno { border-left-color: #ef4444; }
+    .pedido-card.saiu_entrega { border-left-color: #8b5cf6; }
+    .pedido-card.retirou { border-left-color: #f59e0b; }
+    .pedido-card.entregue { border-left-color: #22c55e; }
+    .pedido-card.cancelado { border-left-color: #6b7280; }
+    .pedido-status { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .status-recebido { background: rgba(245,158,11,.2); color: #f59e0b; }
+    .status-confirmado { background: rgba(59,130,246,.2); color: #3b82f6; }
+    .status-em_preparo { background: rgba(249,115,22,.2); color: #f97316; }
+    .status-no_forno { background: rgba(239,68,68,.2); color: #ef4444; }
+    .status-saiu_entrega { background: rgba(139,92,246,.2); color: #8b5cf6; }
+    .status-retirou { background: rgba(245,158,11,.2); color: #f59e0b; }
+    .status-entregue { background: rgba(34,197,94,.2); color: #22c55e; }
+    .status-cancelado { background: rgba(107,114,128,.2); color: #6b7280; }
+    .toast {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100%);
+      z-index: 9999;
+      padding: 14px 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      max-width: 90%;
+      text-align: center;
+      transition: transform 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0,0,0,.5);
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(16px);
+    }
+    .toast-error {
+      background: rgba(248,113,113,.95);
+      color: #fff;
+      border: 1px solid rgba(248,113,113,.5);
+    }
+    .toast-success {
+      background: rgba(74,222,128,.95);
+      color: #000;
+      border: 1px solid rgba(74,222,128,.5);
+    }
+    .toast-info {
+      background: rgba(88,28,135,.95);
+      color: #fff;
+      border: 1px solid rgba(168,85,247,.5);
+    }
+    .toast button {
+      display: block;
+      margin: 10px auto 0;
+      padding: 8px 20px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255,255,255,.2);
+      color: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+    }
+  </style>
+  <div id="toast" class="toast">
+    <div id="toastMsg"></div>
+    <button onclick="hideToast()">OK</button>
+  </div>
+
+<script src="capacitor.js"></script>
+<script src="config.js"></script>
+<script>
+// ============ NOTIFICACOES (global) ============
+var ONGOING_NOTIFICATION_ID = 100;
+
+// Inicializa o plugin LocalNotifications via registerPlugin nativo do Capacitor
+// Isso precede qualquer chamada ao plugin no codigo JS principal
+(function initLocalNotificationsPlugin() {
+  if (window.Capacitor && typeof window.Capacitor.registerPlugin === 'function') {
+    window.Capacitor.registerPlugin('LocalNotifications', {
+      web: function() {
+        return {
+          requestPermissions: function() { return window.Capacitor.nativePromise('LocalNotifications', 'requestPermissions', {}); },
+          schedule: function(opts) { return window.Capacitor.nativePromise('LocalNotifications', 'schedule', opts); },
+          cancel: function(opts) { return window.Capacitor.nativePromise('LocalNotifications', 'cancel', opts); },
+        };
+      }
+    });
+    console.log('[Plugin] LocalNotifications registrado via registerPlugin');
+  } else {
+    console.warn('[Plugin] Capacitor.registerPlugin nao disponivel');
+  }
+})();
+
+function getLocalNotifications() {
+  // Capacitor 6: plugin registrado globalmente via registerPlugin
+  if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.LocalNotifications) {
+    return window.Capacitor.Plugins.LocalNotifications;
+  }
+  return null;
+}
+
+async function requestNotificationPermission() {
+  // Retomar AudioContext (necessario para beep no Android WebView)
+  try {
+    if (audioCtx && audioCtx.state === 'suspended') {
+      await audioCtx.resume();
+    }
+  } catch(e) {}
+  if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+    // Android/iOS: usa plugin nativo via registro global
+    try {
+      const LN = getLocalNotifications();
+      if (LN) {
+        await LN.requestPermissions();
+      } else {
+        console.warn('[Notification] Plugin LocalNotifications nao registrado');
+      }
+    } catch(e) {
+      console.warn('[Notification] Erro permissao nativa:', e.message);
+    }
+  } else {
+    // Web: usa Notification API
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }
+}
+
+// Ongoing notification: fixa na barra, atualiza conforme status muda
+async function updateOngoingNotification(pedido) {
+  if (!window.Capacitor || !window.Capacitor.isNativePlatform()) {
+    // Web: notificação com mensagens amigáveis por status
+    var statusMsgs = APP_CONFIG.msgs;
+    var st = STATUS_PEDIDO[pedido.status] || STATUS_PEDIDO.recebido;
+    var notif = statusMsgs[pedido.status] || { title: '🍕 Pedido ' + st.nome, body: 'Status: ' + st.nome };
+    fallbackWebNotification(notif.title, notif.body, 'status-' + (pedido.status || 'recebido'));
+    playNotificationSound();
+    return;
+  }
+  try {
+    var LN = getLocalNotifications();
+    if (!LN) {
+      console.warn('[Ongoing] Plugin nao registrado');
+      return;
+    }
+    var st = STATUS_PEDIDO[pedido.status] || STATUS_PEDIDO.recebido;
+    var bodyLines = [];
+    bodyLines.push('Status: ' + st.icon + ' ' + st.nome);
+    if (pedido.itens) {
+      var itensStr = pedido.itens.map(function(i){ return i.qty + 'x ' + i.nome; }).join(', ');
+      bodyLines.push(itensStr);
+    }
+    bodyLines.push('Total: R$ ' + (pedido.totalFinal||0).toFixed(2));
+    await LN.schedule({
+      notifications: [{
+        id: ONGOING_NOTIFICATION_ID,
+        title: '🍕 Pedido ' + st.icon + ' ' + st.nome,
+        body: bodyLines.join('\n'),
+        ongoing: true,
+        smallIcon: 'ic_launcher_foreground',
+        iconColor: '#581c87',
+        extra: { pedidoId: pedido.id || '', status: pedido.status || 'recebido' }
+      }]
+    });
+    console.log('[Ongoing] Atualizado:', st.nome);
+  } catch(e) {
+    console.warn('[Ongoing] Erro:', e.message);
+  }
+}
+
+// Cancela ongoing notification quando pedido e finalizado
+async function cancelOngoingNotification() {
+  if (!window.Capacitor || !window.Capacitor.isNativePlatform()) return;
+  try {
+    var LN = getLocalNotifications();
+    if (!LN) return;
+    await LN.cancel({ notifications: [{ id: ONGOING_NOTIFICATION_ID }] });
+    console.log('[Ongoing] Cancelada');
+  } catch(e) {
+    console.warn('[Ongoing] Erro ao cancelar:', e.message);
+  }
+}
+
+// Notificacao pontual (para web ou eventos unicos fora o ciclo do pedido)
+async function sendNotification(title, body, tag) {
+  // Tenta sempre tocar som
+  playNotificationSound();
+
+  if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+    // Android/iOS: notificacao nativa (aparece na barra de notificacoes)
+    try {
+      const { LocalNotifications } = await import('@capacitor/local-notifications');
+      await LocalNotifications.schedule({
+        notifications: [{
+          id: tag ? tag.charCodeAt(0) * 1000 + Date.now() % 1000 : Date.now(),
+          title: title,
+          body: body,
+          smallIcon: 'ic_launcher_foreground',
+          iconColor: '#581c87',
+        }]
+      });
+    } catch(e) {
+      console.warn('[Notification] Erro nativa:', e.message);
+      // Fallback para Web Notification
+      fallbackWebNotification(title, body, tag);
+    }
+  } else {
+    // Web: usa Notification API
+    fallbackWebNotification(title, body, tag);
+  }
+}
+
+function fallbackWebNotification(title, body, tag) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    try {
+      new Notification(title, {
+        body: body,
+        tag: tag || 'pizza-boa',
+        icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍕</text></svg>',
+        badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🍕</text></svg>',
+        vibrate: [200, 100, 200]
+      });
+    } catch(e) {
+      console.warn('[Notification] Erro web:', e.message);
+    }
+  }
+}
+
+var audioCtx = null;
+function playNotificationSound() {
+  try {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    var oscillator = audioCtx.createOscillator();
+    var gainNode = audioCtx.createGain();
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    oscillator.frequency.value = 800;
+    oscillator.type = 'sine';
+    gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+    oscillator.start(audioCtx.currentTime);
+    oscillator.stop(audioCtx.currentTime + 0.5);
+  } catch(e) {
+    console.warn('[Audio] Erro:', e.message);
+  }
+}
+// Welcome Screen sera configurada no DOMContentLoaded (abaixo)
+
+// Welcome Screen sera configurada no DOMContentLoaded (abaixo)
+
+(function(){
+  
+  document.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+  
+  var _devtools = / /;
+  _devtools.toString = function(){ 
+    console.log('%c🚫 Pizza Boa - Ferramentas de desenvolvedor detectadas.','font-size:20px;color:#f87171;font-weight:bold');
+    return 'DevTools detectado';
+  };
+  console.log(_devtools);
+  console.clear();
+})();
+</script>
+</head>
+<body>
+<div id="welcomeScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(135deg,#0a0a0a 0%,#1a1a2e 100%);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:99999;cursor:pointer">
+  <div style="text-align:center;color:#fff">
+    <div style="font-size:80px;margin-bottom:20px">🍕</div>
+    <h1 style="font-size:28px;margin-bottom:8px;font-weight:600;color:#a855f7">Pizza Boa</h1>
+    <p style="font-size:16px;color:#a1a1a1;margin-bottom:30px">Delivery</p>
+    <div style="padding:16px 32px;background:rgba(168,85,247,.2);border:1px solid rgba(168,85,247,.4);border-radius:30px;display:inline-block">
+      <span style="color:#a855f7;font-size:14px;font-weight:500">👉 Toque para começar</span>
+    </div>
+    <p style="font-size:12px;color:#666;margin-top:24px">Você será solicitado a permitir notificações<br>para acompanhar seus pedidos</p>
+  </div>
+</div>
+
+<div class="header">
+  <div style="display:flex;justify-content:space-between;align-items:center">
+    <div><h1>🍕 Pizza Boa</h1><p>Delivery</p></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span class="badge">🕐 45-60 min</span>
+      <span class="badge" id="openBadge" style="color:#4ade80;background:rgba(74,222,128,.15)">Aberto</span>
+      <span class="badge" id="apiBadge" style="display:none;font-size:11px"></span>
+      <div id="horarioAviso" style="display:none;margin-top:8px;padding:8px 12px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:8px;font-size:12px;color:#f87171;text-align:center"></div>
+      <button onclick="showAdminLogin()" style="background:none;border:none;color:#a855f7;font-size:18px;cursor:pointer" title="Admin">⚙️</button>
+    </div>
+  </div>
+</div>
+
+<div style="background:linear-gradient(90deg,rgba(88,28,135,.3),rgba(168,85,247,.2));padding:10px 16px;text-align:center;font-size:13px;color:#a855f7;border-bottom:1px solid rgba(88,28,135,.2)">
+    PEDIDOS ACIMA DE R$ <span id="valorGratis">100</span> TEM ENTREGA GRATIS!
+  </div>
+  <div class="cat-nav"><div class="cat-nav-inner" id="catNavMenu"></div></div>
+
+<!-- Meus Pedidos em Andamento -->
+<div id="meusPedidosSection" style="display:none;padding:16px;background:rgba(88,28,135,.08);border-bottom:1px solid rgba(88,28,135,.2)">
+  <h3 style="font-size:14px;font-weight:700;color:#a855f7;margin-bottom:12px">📋 Meus Pedidos em Andamento</h3>
+  <div id="meusPedidos"></div>
+</div>
+
+<div id="cardapio"></div>
+<div id="adminLoginPage" style="display:none;padding:16px;min-height:100vh;background:#0a0a0a">
+  <button onclick="showHome()" style="color:#a855f7;font-weight:500;font-size:14px;background:none;border:none;cursor:pointer;margin-bottom:24px">← Voltar</button>
+  <div style="max-width:400px;margin:40px auto;text-align:center">
+    <div style="font-size:48px;margin-bottom:16px">🔐</div>
+    <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Painel Admin</h2>
+    <p style="font-size:13px;color:#a1a1a1;margin-bottom:24px">Digite a senha para acessar</p>
+    <input type="password" id="adminPass" placeholder="Senha" style="width:100%;padding:14px;border-radius:12px;background:#1a1a1a;color:#fff;border:1px solid rgba(88,28,135,.3);font-size:16px;text-align:center;letter-spacing:4px" onkeypress="if(event.key==='Enter')showAdminLogin()">
+    <button onclick="showAdminLogin()" style="width:100%;padding:14px;border-radius:12px;background:#581c87;color:#fff;font-weight:700;font-size:16px;border:none;cursor:pointer;margin-top:12px">Entrar</button>
+    <div id="adminPassError" style="color:#f87171;font-size:13px;margin-top:12px;display:none">❌ Senha incorreta</div>
+  </div>
+</div>
+
+<!-- ADMIN PAINEL -->
+<div id="adminPage" style="display:none;padding:16px;min-height:100vh;background:#0a0a0a">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <button onclick="showHome()" style="color:#a855f7;font-weight:500;font-size:14px;background:none;border:none;cursor:pointer">← Voltar</button>
+    <h2 style="font-size:16px;font-weight:700">⚙️ Painel Admin</h2>
+    <button onclick="showHome()" style="color:#f87171;font-size:12px;background:none;border:none;cursor:pointer">Sair</button>
+  </div>
+  
+  <button onclick="limparPedidosEntregues()" style="width:100%;padding:10px;border-radius:8px;background:rgba(248,113,113,.1);color:#f87171;border:1px solid rgba(248,113,113,.3);cursor:pointer;margin-bottom:16px;font-size:13px">🗑️ Limpar Pedidos Entregues</button>
+  <button onclick="atualizarConfig()" style="width:100%;padding:10px;border-radius:8px;background:rgba(88,28,135,.2);color:#a855f7;border:1px solid rgba(88,28,135,.4);cursor:pointer;margin-bottom:16px;font-size:13px">🔄 Atualizar Config da Planilha</button>
+  
+  <!-- Stats -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
+    <div style="background:#1a1a1a;border-radius:12px;padding:10px;text-align:center">
+      <div style="font-size:20px;font-weight:700;color:#f59e0b" id="statRecebido">0</div>
+      <div style="font-size:10px;color:#a1a1a1">📥 Recebido</div>
+    </div>
+    <div style="background:#1a1a1a;border-radius:12px;padding:10px;text-align:center">
+      <div style="font-size:20px;font-weight:700;color:#3b82f6" id="statConfirmado">0</div>
+      <div style="font-size:10px;color:#a1a1a1">✅ Confirmado</div>
+    </div>
+    <div style="background:#1a1a1a;border-radius:12px;padding:10px;text-align:center">
+      <div style="font-size:20px;font-weight:700;color:#f97316" id="statPreparo">0</div>
+      <div style="font-size:10px;color:#a1a1a1">👨‍🍳 Em Preparo</div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px">
+    <div style="background:#1a1a1a;border-radius:12px;padding:10px;text-align:center">
+      <div style="font-size:20px;font-weight:700;color:#ef4444" id="statForno">0</div>
+      <div style="font-size:10px;color:#a1a1a1">🔥 No Forno</div>
+    </div>
+    <div style="background:#1a1a1a;border-radius:12px;padding:10px;text-align:center">
+      <div style="font-size:20px;font-weight:700;color:#8b5cf6" id="statSaiu">0</div>
+      <div style="font-size:10px;color:#a1a1a1">🛵 Saiu p/ Entrega</div>
+    </div>
+    <div style="background:#1a1a1a;border-radius:12px;padding:10px;text-align:center">
+      <div style="font-size:20px;font-weight:700;color:#22c55e" id="statEntregue">0</div>
+      <div style="font-size:10px;color:#a1a1a1">🎉 Entregue</div>
+    </div>
+  </div>
+  
+  <!-- Filtro -->
+  <div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto">
+    <button class="admin-filter active" data-filter="todos" onclick="filterAdmin('todos',this)" style="padding:8px 16px;border-radius:20px;border:none;cursor:pointer;font-size:13px;background:#581c87;color:#fff">Todos</button>
+    <button class="admin-filter" data-filter="recebido" onclick="filterAdmin('recebido',this)" style="padding:8px 16px;border-radius:20px;border:none;cursor:pointer;font-size:13px;background:#1a1a1a;color:#a1a1a1">Recebidos</button>
+    <button class="admin-filter" data-filter="em_preparo" onclick="filterAdmin('em_preparo',this)" style="padding:8px 16px;border-radius:20px;border:none;cursor:pointer;font-size:13px;background:#1a1a1a;color:#a1a1a1">Em Preparo</button>
+    <button class="admin-filter" data-filter="saiu_entrega" onclick="filterAdmin('saiu_entrega',this)" style="padding:8px 16px;border-radius:20px;border:none;cursor:pointer;font-size:13px;background:#1a1a1a;color:#a1a1a1">Saiu</button>
+    <button class="admin-filter" data-filter="entregue" onclick="filterAdmin('entregue',this)" style="padding:8px 16px;border-radius:20px;border:none;cursor:pointer;font-size:13px;background:#1a1a1a;color:#a1a1a1">Entregues</button>
+  </div>
+  
+  <!-- Lista de Pedidos Admin -->
+  <div id="adminPedidosList"></div>
+</div>
+
+<!-- ADMIN DETALHES DO PEDIDO -->
+<div id="adminPedidoDetail" style="display:none;padding:16px;min-height:100vh;background:#0a0a0a">
+  <button onclick="document.getElementById('adminPedidoDetail').style.display='none';document.getElementById('adminPage').style.display='block';carregarAdminPedidos()" style="color:#a855f7;font-weight:500;font-size:14px;background:none;border:none;cursor:pointer;margin-bottom:20px">← Voltar aos Pedidos</button>
+  <div id="adminPedidoDetalhe"></div>
+</div>
+
+<div id="cardapio"></div>
+
+<div class="cart-btn" id="cartBtn" style="display:none">
+  <button onclick="toggleCart()">
+    <span id="cartCount">0 itens</span>
+    <span id="cartTotal">R$ 0,00</span>
+  </button>
+</div>
+
+<div class="modal-overlay" id="itemModal">
+  <div class="modal">
+    <div class="modal-handle"><div></div></div>
+    <div class="modal-content" id="modalContent"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="cartModal">
+  <div class="modal">
+    <div class="modal-handle"><div></div></div>
+    <div class="modal-content" id="cartContent"></div>
+  </div>
+</div>
+
+<div id="checkoutPage" style="display:none">
+  <div class="checkout-section">
+    <button onclick="showHome()" style="color:#a855f7;font-weight:500;font-size:14px;background:none;border:none;cursor:pointer;margin-bottom:16px">← Voltar</button>
+    <h2>Finalizar Pedido</h2>
+    <div id="retiradaToggle" style="display:flex;gap:8px;margin-bottom:20px">
+      <button type="button" class="toggle-btn active" id="btnEntrega" onclick="setRetirada(false)">🛵 Entrega</button>
+      <button type="button" class="toggle-btn" id="btnRetirada" onclick="setRetirada(true)">🏪 Retirada</button>
+    </div>
+    <div id="checkoutError" class="error-msg" style="display:none"></div>
+    <div id="checkoutForm">
+      <div class="form-group">
+        <label>👤 Seu Nome e Sobrenome *</label>
+        <input type="text" id="nome" placeholder="Ex: João Silva (nome e sobrenome)">
+      </div>
+      <div class="form-group">
+        <label>📱 WhatsApp *</label>
+        <input type="tel" id="telefone" placeholder="Ex: 19 99999-9999">
+      </div>
+      <div id="enderecoEntrega">
+      <div class="form-group">
+        <label>📍 Endereço de Entrega *</label>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <input type="text" id="cep" placeholder="CEP" maxlength="9" style="flex:1" onblur="buscarCEP()">
+          <button type="button" onclick="buscarCEP()" style="padding:12px 16px;border-radius:12px;background:#581c87;color:#fff;border:none;cursor:pointer;font-size:13px;font-weight:600">🔍</button>
+        </div>
+        <div id="cepStatus" style="font-size:12px;margin-bottom:8px;display:none"></div>
+        <div id="zonaBox" class="zona-box">
+          <div class="zona-row">
+            <span style="font-size:13px">🛵 <span id="zonaNome"></span></span>
+            <span style="font-size:14px;font-weight:700;color:#a855f7" id="zonaValor"></span>
+          </div>
+          <div id="zonaTempo" style="font-size:11px;color:#a1a1a1;margin-top:2px"></div>
+        </div>
+        <div class="form-row" style="margin-bottom:8px">
+          <input type="text" id="rua" placeholder="Rua *" style="flex:2" oninput="calcularEntrega()">
+          <input type="text" id="numero" placeholder="Nº *" style="flex:1" oninput="formatarNumero(this)">
+        </div>
+        <div class="form-row" style="margin-bottom:8px">
+          <input type="text" id="bairro" placeholder="Bairro *" style="flex:1" oninput="calcularEntrega()">
+          <input type="text" id="cidade" placeholder="Cidade" style="flex:1">
+        </div>
+        <input type="text" id="complemento" placeholder="Complemento" style="margin-bottom:8px" maxlength="200">
+        <input type="text" id="referencia" placeholder="Ponto de referência" maxlength="200">
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#a1a1a1;cursor:pointer">
+          <input type="checkbox" id="salvarEndereco" checked> Salvar endereço
+        </label>
+      </div>
+      </div>
+      <div id="enderecoRetirada" style="display:none;margin-bottom:20px">
+        <div style="background:rgba(88,28,135,.1);border:1px solid rgba(88,28,135,.3);border-radius:12px;padding:16px">
+          <div style="font-size:14px;font-weight:600;color:#a855f7;margin-bottom:8px">🏪 Endereço para Retirada</div>
+          <div style="font-size:13px;color:#a1a1a1">Rua Luiz Razera, 300 - Jardim Elite</div>
+          <div style="font-size:13px;color:#a1a1a1">Piracicaba - SP</div>
+          <div style="font-size:12px;color:#4ade80;margin-top:8px">💰 Sem taxa de entrega!</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>💳 Pagamento</label>
+        <div class="pay-grid">
+          <button type="button" class="pay-btn active" data-pay="dinheiro" onclick="selectPay(this)">💵 Dinheiro</button>
+          <button type="button" class="pay-btn" data-pay="pix" onclick="selectPay(this)">📱 PIX</button>
+          <button type="button" class="pay-btn" data-pay="cartao-credito" onclick="selectPay(this)">💳 Crédito&nbsp;<span style="font-size:10px;color:#a1a1a1">(na entrega)</span></button>
+          <button type="button" class="pay-btn" data-pay="cartao-debito" onclick="selectPay(this)">💳 Débito&nbsp;<span style="font-size:10px;color:#a1a1a1">(na entrega)</span></button>
+        </div>
+      </div>
+      <div id="pixSection" style="display:none;margin-bottom:16px">
+        <div style="background:rgba(88,28,135,.1);border:1px solid rgba(88,28,135,.3);border-radius:12px;padding:16px;text-align:center">
+          <div style="font-size:24px;margin-bottom:8px">📱</div>
+          <div style="font-size:13px;color:#a1a1a1;margin-bottom:8px">Chave PIX para pagamento:</div>
+          <div style="font-size:15px;font-weight:700;color:#a855f7;word-break:break-all;background:rgba(0,0,0,.3);padding:10px;border-radius:8px" id="pixKey">19984356289</div>
+          <button type="button" onclick="copyPixKey()" style="margin-top:10px;padding:8px 16px;border-radius:8px;background:#581c87;color:#fff;border:none;cursor:pointer;font-size:13px">📋 Copiar chave</button>
+          <div id="copyMsg" style="font-size:11px;color:#4ade80;margin-top:6px;display:none">✅ Copiado!</div>
+          <div style="margin-top:12px;padding:10px;background:rgba(37,211,102,.1);border:1px solid rgba(37,211,102,.3);border-radius:8px;font-size:12px;color:#a1a1a1;text-align:center">
+            <span style="color:#25d366;font-weight:700">Importante:</span> após efetuar o pagamento, envie o comprovante pelo WhatsApp para confirmarmos seu pedido.
+          </div>
+        </div>
+      </div>
+      <div id="trocoSection" class="form-group" style="display:none">
+        <label>💵 Valor em mãos *</label>
+        <input type="text" id="troco" placeholder="Ex: 100,00" oninput="formatarTroco(this)">
+        <div style="font-size:11px;color:#a1a1a1;margin-top:4px">Informe o valor para calcular o troco</div>
+      </div>
+      <div class="form-group">
+        <label>📝 Observação</label>
+        <textarea id="obs" rows="2" placeholder="Ex: sem cebola..." maxlength="250" oninput="contarCaracteres(this, 'obsCount')"></textarea>
+        <div id="obsCount" style="font-size:11px;color:#a1a1a1;text-align:right;margin-top:4px">0/250</div>
+      </div>
+      <div id="checkoutSummary"></div>
+      <button class="submit-btn" onclick="submitOrder()">Confirmar Pedido</button>
+    </div>
+    <div id="checkoutSuccess" class="success-screen" style="display:none">
+      <div class="emoji">🎉</div>
+      <h2>Pedido Confirmado!</h2>
+      <p>Seu pedido foi recebido com sucesso!</p>
+      <div id="pedidoCardUsuario" style="margin:16px 0;text-align:left"></div>
+      <a id="waLink" href="#" onclick="enviarWhatsApp();return false;" class="whatsapp-btn">📱 Confirmar pelo WhatsApp</a><br>
+      <button class="back-btn" onclick="showHome()">Voltar ao Início</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+<script>
+var CARDAPIO = {
+  categorias: [
+    { id: "pizzas-salgadas", nome: "Pizzas Salgadas", icone: "🍕",
+      itens: [
+        { id: "mussarela", nome: "Mussarela", descricao: "Molho, mussarela e orégano", tamanhos: [{nome:"Broto",fatias:4,preco:25},{nome:"Media",fatias:6,preco:35},{nome:"Grande",fatias:8,preco:45},{nome:"Familia",fatias:12,preco:60}] },
+        { id: "calabresa", nome: "Calabresa", descricao: "Calabresa, cebola e azeitona", tamanhos: [{nome:"Broto",fatias:4,preco:28},{nome:"Media",fatias:6,preco:38},{nome:"Grande",fatias:8,preco:48},{nome:"Familia",fatias:12,preco:60}] },
+        { id: "frango-catupiry", nome: "Frango c/ Catupiry", descricao: "Frango desfiado e catupiry", tamanhos: [{nome:"Broto",fatias:4,preco:30},{nome:"Media",fatias:6,preco:40},{nome:"Grande",fatias:8,preco:52},{nome:"Familia",fatias:12,preco:70}] },
+        { id: "portuguesa", nome: "Portuguesa", descricao: "Presunto, ovo, cebola e azeitona", tamanhos: [{nome:"Broto",fatias:4,preco:30},{nome:"Media",fatias:6,preco:42},{nome:"Grande",fatias:8,preco:54},{nome:"Familia",fatias:12,preco:70}] },
+        { id: "bacon", nome: "Bacon", descricao: "Bacon e mussarela", tamanhos: [{nome:"Broto",fatias:4,preco:30},{nome:"Media",fatias:6,preco:40},{nome:"Grande",fatias:8,preco:52},{nome:"Familia",fatias:12,preco:70}] },
+        { id: "margherita", nome: "Margherita", descricao: "Mussarela, tomate e manjericão", tamanhos: [{nome:"Broto",fatias:4,preco:28},{nome:"Media",fatias:6,preco:38},{nome:"Grande",fatias:8,preco:48},{nome:"Familia",fatias:12,preco:60}] },
+        { id: "napolitana", nome: "Napolitana", descricao: "Mussarela, tomate, parmesão e orégano", tamanhos: [{nome:"Broto",fatias:4,preco:30},{nome:"Media",fatias:6,preco:40},{nome:"Grande",fatias:8,preco:52},{nome:"Familia",fatias:12,preco:70}] },
+        { id: "peperoni", nome: "Peperoni", descricao: "Mussarela, peperoni e orégano", tamanhos: [{nome:"Broto",fatias:4,preco:32},{nome:"Media",fatias:6,preco:44},{nome:"Grande",fatias:8,preco:56},{nome:"Familia",fatias:12,preco:75}] },
+        { id: "4-queijos", nome: "4 Queijos", descricao: "Mussarela, provolone, parmesão e gorgonzola", tamanhos: [{nome:"Broto",fatias:4,preco:32},{nome:"Media",fatias:6,preco:44},{nome:"Grande",fatias:8,preco:58},{nome:"Familia",fatias:12,preco:75}] },
+        { id: "3-queijos", nome: "3 Queijos", descricao: "Mussarela, catupiry e parmesão", tamanhos: [{nome:"Broto",fatias:4,preco:30},{nome:"Media",fatias:6,preco:40},{nome:"Grande",fatias:8,preco:52},{nome:"Familia",fatias:12,preco:70}] },
+        { id: "catupiry", nome: "Catupiry", descricao: "Mussarela e catupiry original", tamanhos: [{nome:"Broto",fatias:4,preco:28},{nome:"Media",fatias:6,preco:38},{nome:"Grande",fatias:8,preco:48},{nome:"Familia",fatias:12,preco:60}] },
+        { id: "atum", nome: "Atum", descricao: "Atum, cebola e mussarela", tamanhos: [{nome:"Broto",fatias:4,preco:32},{nome:"Media",fatias:6,preco:44},{nome:"Grande",fatias:8,preco:56},{nome:"Familia",fatias:12,preco:75}] },
+        { id: "mista", nome: "Mista", descricao: "Presunto, mussarela e orégano", tamanhos: [{nome:"Broto",fatias:4,preco:26},{nome:"Media",fatias:6,preco:36},{nome:"Grande",fatias:8,preco:46},{nome:"Familia",fatias:12,preco:60}] },
+        { id: "vienna", nome: "Vienna", descricao: "Linguiça calabresa e mussarela", tamanhos: [{nome:"Broto",fatias:4,preco:30},{nome:"Media",fatias:6,preco:40},{nome:"Grande",fatias:8,preco:52},{nome:"Familia",fatias:12,preco:70}] },
+        { id: "bacon-cheddar", nome: "Bacon c/ Cheddar", descricao: "Bacon e cheddar cremoso", tamanhos: [{nome:"Broto",fatias:4,preco:32},{nome:"Media",fatias:6,preco:44},{nome:"Grande",fatias:8,preco:56},{nome:"Familia",fatias:12,preco:75}] },
+        { id: "frango-cream-cheese", nome: "Frango c/ Cream Cheese", descricao: "Frango desfiado e cream cheese", tamanhos: [{nome:"Broto",fatias:4,preco:32},{nome:"Media",fatias:6,preco:44},{nome:"Grande",fatias:8,preco:56},{nome:"Familia",fatias:12,preco:75}] },
+        { id: "escalopes", nome: "Escalopes de Carne", descricao: "Mussarela, carne bovina e cebola", tamanhos: [{nome:"Broto",fatias:4,preco:34},{nome:"Media",fatias:6,preco:46},{nome:"Grande",fatias:8,preco:60},{nome:"Familia",fatias:12,preco:80}] },
+        { id: "camarao", nome: "Camarão", descricao: "Camarão, catupiry e mussarela", tamanhos: [{nome:"Broto",fatias:4,preco:38},{nome:"Media",fatias:6,preco:52},{nome:"Grande",fatias:8,preco:68},{nome:"Familia",fatias:12,preco:90}] },
+        { id: "vegetariana", nome: "Vegetariana", descricao: "Brócolis, champignon, cebola e mussarela", tamanhos: [{nome:"Broto",fatias:4,preco:30},{nome:"Media",fatias:6,preco:42},{nome:"Grande",fatias:8,preco:54},{nome:"Familia",fatias:12,preco:70}] },
+        { id: "rúcula", nome: "Rúcula com Tomate Seco", descricao: "Rúcula, tomate seco e mussarela de búfala", tamanhos: [{nome:"Broto",fatias:4,preco:34},{nome:"Media",fatias:6,preco:46},{nome:"Grande",fatias:8,preco:60},{nome:"Familia",fatias:12,preco:80}] }
+      ]
+    },
+    { id: "pizzas-especiais", nome: "Especiais da Casa", icone: "⭐",
+      itens: [
+        { id: "pizza-supreme", nome: "Supreme", descricao: "Peperoni, calabresa, cebola, pimentão e azeitona", tamanhos: [{nome:"Broto",fatias:4,preco:38},{nome:"Media",fatias:6,preco:52},{nome:"Grande",fatias:8,preco:68},{nome:"Familia",fatias:12,preco:90}] },
+        { id: "costela", nome: "Costela no Bafo", descricao: "Costela desfiada, barbecue e cebola caramelizada", tamanhos: [{nome:"Broto",fatias:4,preco:40},{nome:"Media",fatias:6,preco:55},{nome:"Grande",fatias:8,preco:72},{nome:"Familia",fatias:12,preco:95}] },
+        { id: "bacon-explosao", nome: "Bacon Explosão", descricao: "Bacon, cheddar, parmesão e orégano", tamanhos: [{nome:"Broto",fatias:4,preco:38},{nome:"Media",fatias:6,preco:52},{nome:"Grande",fatias:8,preco:68},{nome:"Familia",fatias:12,preco:90}] },
+        { id: "frango-real", nome: "Frango Real", descricao: "Frango, catupiry, milho e batata palha", tamanhos: [{nome:"Broto",fatias:4,preco:36},{nome:"Media",fatias:6,preco:50},{nome:"Grande",fatias:8,preco:65},{nome:"Familia",fatias:12,preco:85}] },
+        { id: "carne-seca", nome: "Carne Seca c/ Catupiry", descricao: "Carne seca desfiada e catupiry", tamanhos: [{nome:"Broto",fatias:4,preco:40},{nome:"Media",fatias:6,preco:55},{nome:"Grande",fatias:8,preco:72},{nome:"Familia",fatias:12,preco:95}] },
+        { id: "marguerita-especial", nome: "Marguerita Especial", descricao: "Mussarela de búfala, tomate e manjericão fresco", tamanhos: [{nome:"Broto",fatias:4,preco:38},{nome:"Media",fatias:6,preco:52},{nome:"Grande",fatias:8,preco:68},{nome:"Familia",fatias:12,preco:90}] },
+        { id: "lombo-canadense", nome: "Lombo Canadense", descricao: "Lombo, cebola e mussarela", tamanhos: [{nome:"Broto",fatias:4,preco:38},{nome:"Media",fatias:6,preco:52},{nome:"Grande",fatias:8,preco:68},{nome:"Familia",fatias:12,preco:90}] },
+        { id: "coração", nome: "Coração de Frango", descricao: "Coração de frango, catupiry e cebola", tamanhos: [{nome:"Broto",fatias:4,preco:35},{nome:"Media",fatias:6,preco:48},{nome:"Grande",fatias:8,preco:62},{nome:"Familia",fatias:12,preco:80}] },
+        { id: "gorgonzola", nome: "Gorgonzola com Nozes", descricao: "Gorgonzola, mozzarella e nozes", tamanhos: [{nome:"Broto",fatias:4,preco:40},{nome:"Media",fatias:6,preco:55},{nome:"Grande",fatias:8,preco:72},{nome:"Familia",fatias:12,preco:95}] },
+        { id: "pepperoni-especial", nome: "Pepperoni Especial", descricao: "Pepperoni artesanal e mozzarella premium", tamanhos: [{nome:"Broto",fatias:4,preco:40},{nome:"Media",fatias:6,preco:55},{nome:"Grande",fatias:8,preco:72},{nome:"Familia",fatias:12,preco:95}] }
+      ]
+    },
+    { id: "pizzas-doces", nome: "Pizzas Doces", icone: "🍫",
+      itens: [
+        { id: "chocolate", nome: "Chocolate", descricao: "Chocolate ao leite e granulado", tamanhos: [{nome:"Broto",fatias:4,preco:28},{nome:"Media",fatias:6,preco:38},{nome:"Grande",fatias:8,preco:48},{nome:"Familia",fatias:12,preco:60}] },
+        { id: "prestigio", nome: "Prestígio", descricao: "Chocolate, coco ralado e leite condensado", tamanhos: [{nome:"Broto",fatias:4,preco:30},{nome:"Media",fatias:6,preco:40},{nome:"Grande",fatias:8,preco:52},{nome:"Familia",fatias:12,preco:70}] },
+        { id: "banana-canela", nome: "Banana c/ Canela", descricao: "Banana, canela e leite condensado", tamanhos: [{nome:"Broto",fatias:4,preco:25},{nome:"Media",fatias:6,preco:35},{nome:"Grande",fatias:8,preco:45},{nome:"Familia",fatias:12,preco:60}] },
+        { id: "romeu-julieta", nome: "Romeu e Julieta", descricao: "Goiabada e queijo minas", tamanhos: [{nome:"Broto",fatias:4,preco:28},{nome:"Media",fatias:6,preco:38},{nome:"Grande",fatias:8,preco:48},{nome:"Familia",fatias:12,preco:60}] },
+        { id: "chocolate-branco", nome: "Chocolate Branco", descricao: "Chocolate branco e morango", tamanhos: [{nome:"Broto",fatias:4,preco:32},{nome:"Media",fatias:6,preco:42},{nome:"Grande",fatias:8,preco:54},{nome:"Familia",fatias:12,preco:70}] },
+        { id: "banana-nutella", nome: "Banana c/ Nutella", descricao: "Banana e Nutella", tamanhos: [{nome:"Broto",fatias:4,preco:35},{nome:"Media",fatias:6,preco:48},{nome:"Grande",fatias:8,preco:62},{nome:"Familia",fatias:12,preco:80}] },
+        { id: "nutella", nome: "Nutella", descricao: "Nutella com morango", tamanhos: [{nome:"Broto",fatias:4,preco:38},{nome:"Media",fatias:6,preco:50},{nome:"Grande",fatias:8,preco:65},{nome:"Familia",fatias:12,preco:85}] },
+        { id: "sorvete", nome: "Sorvete", descricao: "Chocolate, sorvete e cobertura", tamanhos: [{nome:"Broto",fatias:4,preco:35},{nome:"Media",fatias:6,preco:48},{nome:"Grande",fatias:8,preco:62},{nome:"Familia",fatias:12,preco:80}] },
+        { id: "churros", nome: "Churros", descricao: "Doce de leite, canela e açúcar", tamanhos: [{nome:"Broto",fatias:4,preco:30},{nome:"Media",fatias:6,preco:42},{nome:"Grande",fatias:8,preco:54},{nome:"Familia",fatias:12,preco:70}] },
+        { id: "m&amp;m", nome: "M&M's", descricao: "Chocolate ao leite e M&M's", tamanhos: [{nome:"Broto",fatias:4,preco:36},{nome:"Media",fatias:6,preco:48},{nome:"Grande",fatias:8,preco:62},{nome:"Familia",fatias:12,preco:80}] }
+      ]
+    },
+    { id: "bebidas", nome: "Bebidas", icone: "🥤",
+      itens: [
+        { id: "coca-2l", nome: "Coca-Cola 2L", descricao: "Refrigerante Coca-Cola 2 litros", tamanhos: [{nome:"2L",preco:12}] },
+        { id: "guarana-2l", nome: "Guaraná 2L", descricao: "Refrigerante Guaraná Antarctica 2 litros", tamanhos: [{nome:"2L",preco:10}] },
+        { id: "fanta-2l", nome: "Fanta Laranja 2L", descricao: "Refrigerante Fanta Laranja 2 litros", tamanhos: [{nome:"2L",preco:10}] },
+        { id: "coca-lata", nome: "Coca-Cola Lata", descricao: "Refrigerante Coca-Cola lata 350ml", tamanhos: [{nome:"350ml",preco:6}] },
+        { id: "guarana-lata", nome: "Guaraná Lata", descricao: "Refrigerante Guaraná lata 350ml", tamanhos: [{nome:"350ml",preco:5}] },
+        { id: "suco-laranja", nome: "Suco de Laranja", descricao: "Suco natural de laranja 500ml", tamanhos: [{nome:"500ml",preco:8}] },
+        { id: "suco-uva", nome: "Suco de Uva", descricao: "Suco integral de uva 500ml", tamanhos: [{nome:"500ml",preco:8}] },
+        { id: "agua-500", nome: "Água 500ml", descricao: "Água mineral sem gás", tamanhos: [{nome:"500ml",preco:3}] },
+        { id: "agua-gas", nome: "Água c/ Gás", descricao: "Água mineral com gás 500ml", tamanhos: [{nome:"500ml",preco:4}] },
+        { id: "cerveja", nome: "Cerveja Pilsen", descricao: "Cerveja pilsen 600ml", tamanhos: [{nome:"600ml",preco:8}] }
+      ]
+    }
+  ]
+};
+
+// ============ GOOGLE SHEETS API ============
+var API_URL = APP_CONFIG.apiUrl;
+var apiDisponivel = false;
+var usandoAPI = false;
+var apiPedidoId = null;
+
+async function fetchAPI(action, params, body, signal) {
+  return new Promise(function(resolve) {
+    try {
+      var url = API_URL + '?action=' + encodeURIComponent(action);
+      if (params) {
+        for (var k in params) { url += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }
+      }
+      var xhr = new XMLHttpRequest();
+      xhr.open(body ? 'POST' : 'GET', url, true);
+      xhr.timeout = 10000;
+      if (body) {
+        xhr.setRequestHeader('Content-Type', 'text/plain');
+      }
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+          console.log('[DEBUG]XHR status:', xhr.status, 'response:', xhr.responseText.substring(0, 100));
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              var data = JSON.parse(xhr.responseText);
+              apiDisponivel = true;
+              resolve({ ok: true, data: data });
+            } catch(e) {
+              console.warn('[API] Parse error:', e.message);
+              apiDisponivel = false;
+              resolve({ ok: false, error: 'parse' });
+            }
+          } else {
+            console.warn('[API] HTTP error:', xhr.status);
+            apiDisponivel = false;
+            resolve({ ok: false, error: 'http_' + xhr.status });
+          }
+        }
+      };
+      xhr.ontimeout = function() {
+        console.warn('[API] Timeout');
+        apiDisponivel = false;
+        resolve({ ok: false, error: 'timeout' });
+      };
+      xhr.onerror = function() {
+        console.warn('[API] Network error');
+        apiDisponivel = false;
+        resolve({ ok: false, error: 'network' });
+      };
+      if (signal) {
+        signal.addEventListener('abort', function() { xhr.abort(); });
+      }
+      xhr.send(body ? JSON.stringify(body) : null);
+    } catch(e) {
+      console.warn('[API] Exception:', e.message);
+      apiDisponivel = false;
+      resolve({ ok: false, error: e.message });
+    }
+  });
+}
+
+async function carregarCardapioAPI() {
+  try {
+    var controller = new AbortController();
+    var timeout = setTimeout(function() { controller.abort(); }, 5000);
+    console.log('[DEBUG] carregarCardapioAPI - iniciando');
+    var r = await fetchAPI('cardapio', null, null, controller.signal);
+    clearTimeout(timeout);
+    console.log('[DEBUG] carregarCardapioAPI - resultado:', JSON.stringify(r).substring(0, 300));
+    if (r.ok && r.data && r.data.categorias && r.data.categorias.length > 0) {
+      return r.data.categorias;
+    }
+  } catch(e) {
+    console.warn('[API] cardapio:', e.message);
+  }
+  return null;
+}
+
+async function enviarPedidoAPI(pedido) {
+  try {
+    var url = new URL(API_URL);
+    url.searchParams.set('action', 'novoPedido');
+    var body = 'data=' + encodeURIComponent(JSON.stringify(pedido));
+    var res = await fetch(url.toString(), {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: body
+    });
+    apiDisponivel = true;
+    return null;
+  } catch(e) {
+    console.warn('[API] enviarPedido:', e.message);
+    return null;
+  }
+}
+
+// Envia pedido via hidden iframe + form submit (workaround CORS para GAS)
+function enviarPedidoForm(pedido) {
+  var form = document.createElement('form');
+  form.method = 'POST';
+  form.action = API_URL;
+  form.target = 'apiFrame';
+  form.style.display = 'none';
+  var input = document.createElement('input');
+  input.type = 'hidden';
+  input.name = 'data';
+  input.value = JSON.stringify({action:'novoPedido', data: pedido});
+  form.appendChild(input);
+  document.body.appendChild(form);
+  form.submit();
+  setTimeout(function() { document.body.removeChild(form); }, 5000);
+}
+
+async function carregarPedidosAPI() {
+  var r = await fetchAPI('pedidos', null, null);
+  if (r.ok && r.data && r.data.pedidos) {
+    return r.data.pedidos;
+  }
+  return null;
+}
+
+async function atualizarStatusAPI(pedidoId, status) {
+  try {
+    var form = document.createElement('form');
+    form.method = 'POST';
+    form.action = API_URL;
+    form.target = 'apiFrame';
+    form.style.display = 'none';
+    var input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'data';
+    input.value = JSON.stringify({action:'atualizarStatus', pedidoId: pedidoId, status: status});
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(function() { document.body.removeChild(form); }, 5000);
+    return true;
+  } catch(e) {
+    console.warn('[API] atualizarStatus erro:', e.message);
+    return false;
+  }
+}
+
+async function carregarConfigAPI() {
+  var r = await fetchAPI('config', null, null);
+  if (r.ok && r.data) {
+    return r.data;
+  }
+  return null;
+}
+
+async function atualizarConfig() {
+  var config = await carregarConfigAPI();
+  if (config) {
+    // Atualiza horarios
+    if (config.horarioInicio !== undefined) {
+      HORA_INICIO = parseInt(config.horarioInicio) || HORA_INICIO;
+      isPizzariaAberta(); // Forca recalcular o aviso
+    }
+    if (config.horarioFim !== undefined) {
+      HORA_FIM = parseInt(config.horarioFim) || HORA_FIM;
+      isPizzariaAberta(); // Forca recalcular o aviso
+    }
+    // Atvaliza taxas e valores
+    if (config.taxaMaxima !== undefined) TAXA_MAXIMA = parseFloat(config.taxaMaxima) || TAXA_MAXIMA;
+    if (config.pedidoGratisMinimo !== undefined) MIN_PEDIDO_GRATIS = parseFloat(config.pedidoGratisMinimo) || MIN_PEDIDO_GRATIS;
+    if (config.valorMinimoEntrega !== undefined) MIN_PEDIDO_ENTREGA = parseFloat(config.valorMinimoEntrega) || MIN_PEDIDO_ENTREGA;
+    if (config.whatsapp !== undefined) window.WHATSAPP_NUM = config.whatsapp;
+
+    // Atualiza o aviso de horario na pagina inicial
+    updateHorarioHeader();
+    // Atualiza o texto de entrega gratis no banner
+    var valorGratis = document.getElementById('valorGratis');
+    if (valorGratis) valorGratis.textContent = MIN_PEDIDO_GRATIS.toFixed(0);
+    // Salva no localStorage para atualizar em outras abas
+    localStorage.setItem('configPedidoGratis', MIN_PEDIDO_GRATIS);
+
+    // Mostra confirmacao
+    alert('Configuracoes atualizadas com sucesso!\n\n' +
+          'Horario: ' + HORA_INICIO + 'h - ' + HORA_FIM + 'h\n' +
+          'Taxa Maxima: R$ ' + TAXA_MAXIMA.toFixed(2) + '\n' +
+          'Pedido Gratis Minimo: R$ ' + MIN_PEDIDO_GRATIS.toFixed(2) + '\n' +
+          'Valor Minimo Entrega: R$ ' + MIN_PEDIDO_ENTREGA.toFixed(2));
+
+    console.log('[Config] Atualizada manualmente:', config);
+  } else {
+    alert('Erro ao carregar configuracoes da planilha.');
+  }
+}
+
+// Normaliza itens da API (tamanho unico -> array de tamanhos)
+function normalizarItens(categorias) {
+  for (var c = 0; c < categorias.length; c++) {
+    for (var i = 0; i < categorias[c].itens.length; i++) {
+      var it = categorias[c].itens[i];
+      if (!it.tamanhos) {
+        it.tamanhos = [{nome: it.tamanho || '', fatias: it.fatias || null, preco: it.preco || 0}];
+      }
+      if (!it.id && it.itemId) it.id = it.itemId;
+      if (!it.nome && it.itemNome) it.nome = it.itemNome;
+      if (!it.descricao && it.itemDescricao) it.descricao = it.itemDescricao;
+    }
+  }
+  return categorias;
+}
+
+var DIAS_FUNCIONAMENTO = [0, 2, 3, 4, 5, 6]; // Dom, Ter, Qua, Qui, Sex, Sab (Segunda fechado)
+var HORA_INICIO = 18;
+var HORA_FIM = 1;
+
+function isPizzariaAberta() {
+  return true; // Horario desativado para testes
+}
+
+function getHorarioInfo() {
+  var agora = new Date();
+  var dia = agora.getDay();
+  var hora = agora.getHours();
+  var nomes = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+  if (DIAS_FUNCIONAMENTO.indexOf(dia) < 0) return 'Hoje é ' + nomes[dia] + '. Abrimos de Terça a Domingo, ' + HORA_INICIO + 'h-' + HORA_FIM + 'h.';
+  if (hora >= HORA_FIM && hora < HORA_INICIO) return 'Ainda não abrimos. Hoje abrimos às ' + HORA_INICIO + 'h.';
+  return 'Estamos abertos!';
+}
+
+var TAXA_FIXA_MOTOBOY = 3.0;
+var TAXA_POR_KM = 1.0;
+var TAXA_MAXIMA = 25.0;
+var MIN_PEDIDO_GRATIS = 100;
+var MIN_PEDIDO_ENTREGA = APP_CONFIG.pedidoMinimo || 30;
+var zonaAtual = null;
+
+var ZONAS_ENTREGA = [
+  { nome: "Jardim Elite", bairros: ["jardim elite","jd. elite","elite"], dist: 1, taxa: 4 },
+  { nome: "Centro", bairros: ["centro","alto","nova piracicaba","vila cristina"], dist: 2, taxa: 5 },
+  { nome: "Nova America", bairros: ["nova america","nova américa","america"], dist: 4, taxa: 7 },
+  { nome: "Vila Reis", bairros: ["vila reis","reis"], dist: 3, taxa: 6 },
+  { nome: "Sao Judas", bairros: ["sao judas","judas"], dist: 3.5, taxa: 6.5 },
+  { nome: "Morumbi", bairros: ["morumbi"], dist: 4, taxa: 7 },
+  { nome: "Pacaembu", bairros: ["pacaembu"], dist: 4.5, taxa: 7.5 },
+  { nome: "Corrego", bairros: ["corrego","córrego"], dist: 3.5, taxa: 6.5 },
+  { nome: "Santa Olimpia", bairros: ["santa olimpia","santa olímpia"], dist: 4, taxa: 7 },
+  { nome: "Verde", bairros: ["verde","vila verde","monsenhor martinho","martinho"], dist: 5, taxa: 8 },
+  { nome: "Tupi", bairros: ["tupi","tupy","campestre"], dist: 6, taxa: 9 },
+  { nome: "Aguas Claras", bairros: ["aguas claras","águas claras","irmaos camargo","irmãos camargo"], dist: 7, taxa: 10 },
+  { nome: "Alfredo Guedes", bairros: ["alfredo guedes","jardim gloria","jd. gloria","esplanada","ceu azul","céu azul"], dist: 8, taxa: 11 },
+  { nome: "Vila Monteiro", bairros: ["vila monteiro","monteiro","geraldao","geraldão","potumirim","santa teresa","sta. teresa"], dist: 10, taxa: 13 },
+  { nome: "Anhumas", bairros: ["anhumas"], dist: 12, taxa: 15 }
+];
+
+function norm(s) { return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+
+function calcularEntrega() {
+  var bairro = document.getElementById('bairro').value.trim();
+  var rua = document.getElementById('rua').value.trim();
+  if (!bairro || !rua) { document.getElementById('zonaBox').style.display = 'none'; zonaAtual = null; renderCheckoutSummary(); return; }
+  var box = document.getElementById('zonaBox');
+  var statusEl = document.getElementById('cepStatus');
+  box.style.display = 'block'; statusEl.style.display = 'block';
+  document.getElementById('zonaNome').textContent = 'Calculando...';
+  document.getElementById('zonaValor').textContent = '';
+  document.getElementById('zonaTempo').textContent = '';
+  var bn = norm(bairro);
+  var encontrada = null;
+  for (var i = 0; i < ZONAS_ENTREGA.length; i++) {
+    for (var j = 0; j < ZONAS_ENTREGA[i].bairros.length; j++) {
+      if (bn.indexOf(ZONAS_ENTREGA[i].bairros[j]) >= 0 || ZONAS_ENTREGA[i].bairros[j].indexOf(bn) >= 0) { encontrada = ZONAS_ENTREGA[i]; break; }
+    }
+    if (encontrada) break;
+  }
+  if (!encontrada) encontrada = { nome: "Zona Piracicaba", dist: 8, taxa: 11 };
+  var taxa = encontrada.taxa;
+  // Aplica limite maximo de taxa
+  if (taxa > TAXA_MAXIMA) taxa = TAXA_MAXIMA;
+  var totalPed = 0; for (var i = 0; i < cart.length; i++) totalPed += cart[i].preco * cart[i].qty;
+  if (totalPed >= MIN_PEDIDO_GRATIS) taxa = 0;
+  var tMin = Math.round(encontrada.dist * 5 + 20);
+  var tMax = Math.round(encontrada.dist * 7 + 30);
+  box.className = 'zona-box zona-ok';
+  document.getElementById('zonaNome').textContent = encontrada.nome + ' (~' + encontrada.dist + ' km)';
+  document.getElementById('zonaValor').textContent = taxa === 0 ? 'GRATIS' : 'R$ ' + taxa.toFixed(2);
+  document.getElementById('zonaValor').style.color = taxa === 0 ? '#4ade80' : '#a855f7';
+  document.getElementById('zonaTempo').textContent = tMin + '-' + tMax + ' min';
+  statusEl.textContent = 'Entrega calculada!'; statusEl.style.color = '#4ade80';
+  zonaAtual = { valor: taxa, tempo: tMin + '-' + tMax + ' min', distKm: encontrada.dist, nome: encontrada.nome };
+  renderCheckoutSummary();
+}
+
+var cart = [];
+var currentItem = null;
+var selTamanho = null;
+var selMetade = false;
+var selSegundo = null;
+var selBorda = 0;
+var selQty = 1;
+var ultimoPedidoId = null;
+var deviceId = localStorage.getItem('pizzaDeviceId') || (function(){
+  var id = 'd_' + Date.now() + '_' + Math.random().toString(36).substring(2,8);
+  localStorage.setItem('pizzaDeviceId', id);
+  return id;
+})();
+var contadorPedidos = parseInt(localStorage.getItem('contadorPedidos') || '0');
+var retirada = false;
+
+function setRetirada(val) {
+  retirada = val;
+  document.getElementById('btnEntrega').classList.toggle('active', !val);
+  document.getElementById('btnRetirada').classList.toggle('active', val);
+  document.getElementById('enderecoEntrega').style.display = val ? 'none' : 'block';
+  document.getElementById('enderecoRetirada').style.display = val ? 'block' : 'none';
+  if (val) { zonaAtual = { valor: 0, tempo: 'Retirada', distKm: 0, nome: 'Retirada' }; }
+  else { zonaAtual = null; document.getElementById('zonaBox').style.display = 'none'; document.getElementById('cepStatus').style.display = 'none'; }
+  renderCheckoutSummary();
+}
+
+function render() {
+  var nav = document.getElementById('catNavMenu');
+  var cardapio = document.getElementById('cardapio');
+  var h = '', c = '';
+  for (var i = 0; i < CARDAPIO.categorias.length; i++) {
+    var cat = CARDAPIO.categorias[i];
+    h += '<button class="cat-btn ' + (i === 0 ? 'active' : '') + '" data-cat="' + cat.id + '">' + cat.icone + ' ' + cat.nome + '</button>';
+    var items = '';
+    for (var j = 0; j < cat.itens.length; j++) {
+      var it = cat.itens[j];
+      var preco = 0;
+      if (it.tamanhos && it.tamanhos.length > 0) {
+        preco = it.tamanhos[0].preco;
+      } else if (it.preco !== undefined) {
+        preco = it.preco;
+      }
+      items += '<div class="item-card" onclick="openItem(\'' + cat.id + '\', \'' + it.id + '\')"><h3>' + it.nome + '</h3><p>' + it.descricao + '</p><div class="price">R$ ' + preco.toFixed(2) + '</div></div>';
+    }
+    c += '<div class="section" id="cat-' + cat.id + '"><h2 class="section-title">' + cat.icone + ' ' + cat.nome + '</h2>' + items + '</div>';
+  }
+  nav.innerHTML = h;
+  cardapio.innerHTML = c;
+  // Indicador de conexao
+  var badge = document.getElementById('apiBadge');
+  if (badge) {
+    badge.style.display = 'inline-block';
+    if (usandoAPI) { badge.textContent = '🟢 Online'; badge.style.color = '#4ade80'; badge.style.background = 'rgba(74,222,128,.15)'; }
+    else { badge.textContent = '🟡 Offline'; badge.style.color = '#f59e0b'; badge.style.background = 'rgba(245,158,11,.15)'; }
+  }
+}
+
+document.querySelector('.cat-nav').addEventListener('click', function(e) {
+  var btn = e.target.closest('.cat-btn');
+  if (!btn) return;
+  this.querySelectorAll('.cat-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  var target = document.getElementById('cat-' + btn.dataset.cat);
+  if (target) window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - 120, behavior: 'smooth' });
+});
+
+function openItem(catId, itemId) {
+  var cat = null, item = null;
+  for (var i = 0; i < CARDAPIO.categorias.length; i++) {
+    if (CARDAPIO.categorias[i].id === catId) {
+      cat = CARDAPIO.categorias[i];
+      for (var j = 0; j < cat.itens.length; j++) { if (cat.itens[j].id === itemId) { item = cat.itens[j]; break; } }
+      break;
+    }
+  }
+  if (!item) return;
+  currentItem = item; selTamanho = item.tamanhos[0]; selMetade = false; selSegundo = null; selBorda = 0; selQty = 1;
+  var isPizza = catId.indexOf('pizza') >= 0;
+  var h = '';
+  h += '<div class="modal-header"><div><h2>' + item.nome + '</h2><p>' + item.descricao + '</p></div>';
+  h += '<button class="modal-close" onclick="closeModal(\'itemModal\')">✕</button></div>';
+  h += '<label class="label">Tamanho</label><div class="size-grid">';
+  for (var i = 0; i < item.tamanhos.length; i++) {
+    var t = item.tamanhos[i];
+    h += '<button class="size-btn ' + (i === 0 ? 'active' : '') + '" onclick="selectTamanho(' + i + ')"><div>' + t.nome + '</div>' + (t.fatias ? '<div class="slices">' + t.fatias + ' fatias</div>' : '') + '<span class="price">R$ ' + t.preco.toFixed(2) + '</span></button>';
+  }
+  h += '</div>';
+  if (isPizza) {
+    h += '<label class="label">Como deseja?</label><div class="toggle-row">';
+    h += '<button class="toggle-btn active" id="btnInteira" onclick="setMetade(false)">Inteira<div style="font-size:11px;opacity:0.7">R$ ' + selTamanho.preco.toFixed(2) + '</div></button>';
+    h += '<button class="toggle-btn" id="btnMetade" onclick="setMetade(true)">Metade/Metade<div style="font-size:11px;opacity:0.7">2 sabores</div></button>';
+    h += '</div><div id="metadeSection"></div>';
+  }
+  if (isPizza) {
+    h += '<label class="label">Borda Recheada</label><div class="toggle-row">';
+    h += '<button class="toggle-btn active" id="btnBordaNao" onclick="setBorda(0)">Sem borda</button>';
+    h += '<button class="toggle-btn" id="btnBordaSim" onclick="setBorda(1)">Catupiry <span style="font-size:11px;opacity:0.7">+ R$ 8,00</span></button>';
+    h += '</div>';
+  }
+  h += '<label class="label">Quantidade</label><div class="qty-row"><button class="qty-btn minus" onclick="changeQty(-1)">−</button><span class="qty-val" id="qtyVal">' + selQty + '</span><button class="qty-btn plus" onclick="changeQty(1)">+</button></div>';
+  h += '<button class="add-btn" id="addBtn" onclick="addToCart()">Adicionar — R$ ' + calcPrice().toFixed(2) + '</button>';
+  document.getElementById('modalContent').innerHTML = h;
+  document.getElementById('itemModal').style.display = 'flex';
+}
+
+function selectTamanho(idx) {
+  selTamanho = currentItem.tamanhos[idx];
+  document.querySelectorAll('.size-btn').forEach(function(b) { b.classList.remove('active'); });
+  event.target.closest('.size-btn').classList.add('active');
+  var btn = document.getElementById('btnInteira');
+  if (btn) btn.innerHTML = 'Inteira<div style="font-size:11px;opacity:0.7">R$ ' + selTamanho.preco.toFixed(2) + '</div>';
+  
+  if (selMetade) {
+    var sec = document.getElementById('metadeSection');
+    if (sec) {
+      
+      var metadeSpans = sec.querySelectorAll('.metade-row span');
+      if (metadeSpans.length > 0) metadeSpans[metadeSpans.length - 1].textContent = 'R$ ' + selTamanho.preco.toFixed(2);
+      
+      var saborBtns = sec.querySelectorAll('.sabor-btn');
+      for (var i = 0; i < saborBtns.length; i++) {
+        var sid = saborBtns[i].getAttribute('data-id');
+        if (sid) {
+          var todos = CARDAPIO.categorias.flatMap(function(c) { return c.itens; });
+          var s = todos.find(function(it) { return it.id === sid; });
+          if (s) {
+            var sp = s.tamanhos.find(function(t) { return t.nome === selTamanho.nome; }) || s.tamanhos[0];
+            var pm = Math.max(selTamanho.preco, sp.preco);
+            var span = saborBtns[i].querySelector('span');
+            if (span) span.textContent = 'R$ ' + pm.toFixed(2);
+          }
+        }
+      }
+    }
+  }
+  updateAddBtn();
+}
+function setBorda(val) { selBorda = val; document.getElementById('btnBordaNao').classList.toggle('active', val === 0); document.getElementById('btnBordaSim').classList.toggle('active', val === 1); updateAddBtn(); }
+function setMetade(val) { selMetade = val; selSegundo = null; document.getElementById('btnInteira').classList.toggle('active', !val); document.getElementById('btnMetade').classList.toggle('active', val); var sec = document.getElementById('metadeSection'); if (val) { var h = '<div class="metade-info"><div class="metade-row"><span>1a metade: <strong>' + currentItem.nome + '</strong></span><span style="color:#a855f7">R$ ' + selTamanho.preco.toFixed(2) + '</span></div><div style="font-size:12px;color:#a1a1a1">Escolha a 2a metade:</div><div style="font-size:11px;color:#f59e0b;margin-top:4px">O preco final sera da metade mais cara</div></div>'; for (var c = 0; c < CARDAPIO.categorias.length; c++) { var cat = CARDAPIO.categorias[c]; if (cat.id.indexOf('pizza') < 0) continue; var itens = cat.itens.filter(function(i) { return i.id !== currentItem.id; }); if (itens.length === 0) continue; var icone = cat.id.indexOf('doce') >= 0 ? '🍫' : (cat.id.indexOf('especial') >= 0 ? '⭐' : '🍕'); h += '<div class="cat-label">' + icone + ' ' + cat.nome + '</div><div class="sabor-grid">'; for (var i = 0; i < itens.length; i++) { var s = itens[i]; var sp = s.tamanhos.find(function(t) { return t.nome === selTamanho.nome; }) || s.tamanhos[0]; var pm = Math.max(selTamanho.preco, sp.preco); h += '<button class="sabor-btn" data-id="' + s.id + '" onclick="selectSegundo(\'' + s.id + '\')">' + s.nome + ' <span>R$ ' + sp.preco.toFixed(2) + '</span></button>'; } h += '</div>'; } sec.innerHTML = h; } else { sec.innerHTML = ''; } updateAddBtn(); }
+function selectSegundo(id) { selSegundo = id; document.querySelectorAll('.sabor-btn').forEach(function(b) { b.classList.remove('active'); }); event.target.closest('.sabor-btn').classList.add('active'); updateAddBtn(); }
+function changeQty(d) { selQty = Math.max(1, selQty + d); document.getElementById('qtyVal').textContent = selQty; updateAddBtn(); }
+
+function calcPrice() {
+  var preco = selTamanho.preco;
+  if (selMetade && selSegundo) { var todos = CARDAPIO.categorias.flatMap(function(c) { return c.itens; }); var s = todos.find(function(i) { return i.id === selSegundo; }); if (s) { var sp = s.tamanhos.find(function(t) { return t.nome === selTamanho.nome; }) || s.tamanhos[0]; preco = Math.max(preco, sp.preco); } }
+  if (selBorda) preco += 8;
+  return preco * selQty;
+}
+
+function updateAddBtn() { var btn = document.getElementById('addBtn'); if (btn) { btn.textContent = 'Adicionar — R$ ' + calcPrice().toFixed(2); btn.disabled = selMetade && !selSegundo; } }
+
+function addToCart() {
+  var nome = currentItem.nome;
+  if (selMetade && selSegundo) { var todos = CARDAPIO.categorias.flatMap(function(c) { return c.itens; }); var s = todos.find(function(i) { return i.id === selSegundo; }); if (s) nome = '1/2 ' + currentItem.nome + ' / 1/2 ' + s.nome; }
+  if (selBorda) nome += ' (borda catupiry)';
+  cart.push({ nome: nome, tamanho: selTamanho.nome, preco: calcPrice() / selQty, qty: selQty });
+  closeModal('itemModal'); updateCartButton();
+}
+
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+function updateHorarioHeader() {
+  var aberta = isPizzariaAberta();
+  var badge = document.getElementById('openBadge');
+  var aviso = document.getElementById('horarioAviso');
+  if (badge) { badge.textContent = aberta ? 'Aberto' : 'Fechado'; badge.style.color = aberta ? '#4ade80' : '#f87171'; badge.style.background = aberta ? 'rgba(74,222,128,.15)' : 'rgba(248,113,113,.15)'; }
+  if (aviso) { aviso.style.display = aberta ? 'none' : 'block'; if (!aberta) aviso.textContent = getHorarioInfo(); }
+}
+
+function updateCartButton() { var btn = document.getElementById('cartBtn'); if (!btn) return; var count = 0, total = 0; for (var i = 0; i < cart.length; i++) { count += cart[i].qty; total += cart[i].preco * cart[i].qty; } if (count > 0) { btn.style.display = 'block'; document.getElementById('cartCount').textContent = count + ' item' + (count > 1 ? 's' : ''); document.getElementById('cartTotal').textContent = 'R$ ' + total.toFixed(2); } else { btn.style.display = 'none'; } }
+
+function toggleCart() { if (!isPizzariaAberta()) { alert('Estamos fechados!\n\nHorario: Terca a Domingo, ' + HORA_INICIO + 'h-' + HORA_FIM + 'h.'); return; } var modal = document.getElementById('cartModal'); modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex'; if (modal.style.display === 'flex') renderCart(); }
+
+function renderCart() {
+  var h = ''; var total = 0;
+  for (var i = 0; i < cart.length; i++) { var it = cart[i]; h += '<div class="cart-item"><div class="cart-item-info"><div class="name">' + it.qty + 'x ' + it.nome + ' (' + it.tamanho + ')</div><div class="price">R$ ' + (it.preco * it.qty).toFixed(2) + '</div></div><button onclick="removeCartItem(' + i + ')" style="background:none;border:none;color:#f87171;font-size:18px;cursor:pointer">✕</button></div>'; total += it.preco * it.qty; }
+  h += '<div class="cart-summary"><div class="cart-summary-row"><span class="lbl">Subtotal</span><span>R$ ' + total.toFixed(2) + '</span></div><div class="cart-summary-row"><span class="lbl">Entrega</span><span>Calculada no checkout</span></div><div class="cart-summary-total"><span>Total</span><span class="val">R$ ' + total.toFixed(2) + '</span></div><button class="add-btn" onclick="goCheckout()">Finalizar Pedido</button></div>';
+  document.getElementById('cartContent').innerHTML = h;
+}
+
+function removeCartItem(idx) { cart.splice(idx, 1); updateCartButton(); renderCart(); }
+
+function goCheckout() {
+  document.getElementById('cartModal').style.display = 'none';
+  document.getElementById('cartBtn').style.display = 'none';
+  document.getElementById('checkoutPage').style.display = 'block';
+  document.getElementById('cardapio').style.display = 'none';
+  document.getElementById('catNavMenu').style.display = 'none';
+  document.getElementById('checkoutForm').style.display = 'block';
+  document.getElementById('checkoutSuccess').style.display = 'none';
+  document.getElementById('cep').value = '';
+  document.getElementById('rua').value = '';
+  document.getElementById('bairro').value = '';
+  document.getElementById('cidade').value = '';
+  document.getElementById('numero').value = '';
+  document.getElementById('nome').value = '';
+  document.getElementById('telefone').value = '';
+  document.getElementById('troco').value = '';
+  document.getElementById('obs').value = '';
+  document.getElementById('cepStatus').style.display = 'none';
+  document.getElementById('zonaBox').style.display = 'none';
+  document.getElementById('meusPedidosSection').style.display = 'none';
+  zonaAtual = null;
+  retirada = false;
+  document.getElementById('btnEntrega').classList.add('active');
+  document.getElementById('btnRetirada').classList.remove('active');
+  document.getElementById('enderecoEntrega').style.display = 'block';
+  document.getElementById('enderecoRetirada').style.display = 'none';
+  renderCheckoutSummary();
+  
+  var btnDinheiro = document.querySelector('.pay-btn[data-pay="dinheiro"]');
+  if (btnDinheiro) selectPay(btnDinheiro);
+  window.scrollTo(0, 0);
+}
+
+function renderCheckoutSummary() {
+  var total = 0; for (var i = 0; i < cart.length; i++) total += cart[i].preco * cart[i].qty;
+  var h = '<div class="cart-summary">';
+  for (var i = 0; i < cart.length; i++) { var it = cart[i]; h += '<div class="cart-summary-row"><span class="lbl">' + it.qty + 'x ' + it.nome + ' (' + it.tamanho + ')</span><span>R$ ' + (it.preco * it.qty).toFixed(2) + '</span></div>'; }
+  h += '<div class="cart-summary-row"><span class="lbl">Subtotal</span><span>R$ ' + total.toFixed(2) + '</span></div>';
+  var entrega = zonaAtual ? zonaAtual.valor : 0;
+  if (zonaAtual) { h += '<div class="cart-summary-row"><span class="lbl">' + (retirada ? '🏪 Retirada' : '🛵 Entrega (' + zonaAtual.nome + ')') + '</span><span style="color:' + (zonaAtual.valor === 0 ? '#4ade80' : '#a855f7') + '">' + (zonaAtual.valor === 0 ? (retirada ? 'GRATIS' : 'GRATIS') : 'R$ ' + zonaAtual.valor.toFixed(2)) + '</span></div>'; }
+  if (total > 0 && total < MIN_PEDIDO_GRATIS && zonaAtual && zonaAtual.valor > 0) { h += '<div style="margin-top:8px;padding:8px;background:rgba(74,222,128,.1);border-radius:8px;font-size:12px;color:#4ade80;text-align:center">Falta R$ ' + (MIN_PEDIDO_GRATIS - total).toFixed(2) + ' para entrega GRATIS!</div>'; }
+  if (!retirada && total > 0 && total < MIN_PEDIDO_ENTREGA) { h += '<div style="margin-top:8px;padding:8px;background:rgba(248,113,113,.1);border-radius:8px;font-size:12px;color:#f87171;text-align:center">⚠️ Valor minimo para entrega: R$ ' + MIN_PEDIDO_ENTREGA.toFixed(2) + ' (falta R$ ' + (MIN_PEDIDO_ENTREGA - total).toFixed(2) + ')</div>'; }
+  h += '<div class="cart-summary-total"><span>Total</span><span class="val">R$ ' + (total + entrega).toFixed(2) + '</span></div></div>';
+  document.getElementById('checkoutSummary').innerHTML = h;
+  // Desabilita o botao se entrega e valor insuficiente
+  var btn = document.querySelector('.submit-btn');
+  if (btn) {
+    if (!retirada && total > 0 && total < MIN_PEDIDO_ENTREGA) {
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      btn.textContent = 'Minimo R$ ' + MIN_PEDIDO_ENTREGA.toFixed(2) + ' para entrega';
+    } else {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.textContent = 'Confirmar Pedido';
+    }
+  }
+}
+
+function buscarCEP() {
+  var cep = document.getElementById('cep').value.replace(/\D/g, '');
+  if (cep.length !== 8) return;
+  var statusEl = document.getElementById('cepStatus'); statusEl.style.display = 'block'; statusEl.textContent = 'Buscando...'; statusEl.style.color = '#a1a1a1';
+  var xhr = new XMLHttpRequest(); xhr.open('GET', 'https://viacep.com.br/ws/' + cep + '/json/', true);
+  xhr.onreadystatechange = function() { if (xhr.readyState === 4 && xhr.status === 200) { try { var data = JSON.parse(xhr.responseText); if (data.erro) { statusEl.textContent = 'CEP nao encontrado'; statusEl.style.color = '#f87171'; return; } document.getElementById('rua').value = data.logradouro || ''; document.getElementById('bairro').value = data.bairro || ''; document.getElementById('cidade').value = (data.localidade || '') + (data.uf ? ' - ' + data.uf : ''); statusEl.textContent = data.logradouro + ', ' + data.bairro; statusEl.style.color = '#4ade80'; document.getElementById('cep').value = cep.substring(0,5) + '-' + cep.substring(5); calcularEntrega(); document.getElementById('numero').focus(); } catch(e) { statusEl.textContent = 'Erro'; statusEl.style.color = '#f87171'; } } };
+  xhr.send();
+}
+
+function selectPay(btn) { document.querySelectorAll('.pay-btn').forEach(function(b) { b.classList.remove('active'); }); btn.classList.add('active'); document.getElementById('trocoSection').style.display = btn.dataset.pay === 'dinheiro' ? 'block' : 'none'; document.getElementById('pixSection').style.display = btn.dataset.pay === 'pix' ? 'block' : 'none'; }
+function copyPixKey() { var key = document.getElementById('pixKey').textContent; if (navigator.clipboard) { navigator.clipboard.writeText(key).then(function() { showCopyMsg(); }).catch(function() { fallbackCopy(key); }); } else { fallbackCopy(key); } }
+function fallbackCopy(text) { var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); showCopyMsg(); } catch(e) { alert('Copie: ' + text); } document.body.removeChild(ta); }
+function showCopyMsg() { var msg = document.getElementById('copyMsg'); msg.style.display = 'block'; setTimeout(function() { msg.style.display = 'none'; }, 2000); }
+function formatarTroco(input) {
+  // Remove tudo que não é número ou vírgula
+  var valor = input.value.replace(/[^0-9,]/g, '');
+  // Garante só uma vírgula
+  var partes = valor.split(',');
+  if (partes.length > 2) valor = partes[0] + ',' + partes.slice(1).join('');
+  // Limita a 2 casas decimais
+  if (partes[1] && partes[1].length > 2) valor = partes[0] + ',' + partes[1].substring(0, 2);
+  input.value = valor;
+}
+function parseTroco(valor) {
+  // Converte "100,00" ou "100.00" ou "100" para número
+  if (!valor) return 0;
+  valor = valor.replace(/\./g, '').replace(',', '.');
+  return parseFloat(valor) || 0;
+}
+
+// ============ SEGURANCA E VALIDACAO ============
+// Sanitiza texto para evitar XSS
+function sanitizarTexto(texto) {
+  if (!texto) return '';
+  return texto.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;');
+}
+
+// Valida CEP (8 dígitos numéricos)
+function validarCEP(cep) {
+  var clean = cep.replace(/\D/g, '');
+  return clean.length === 8;
+}
+
+// Limita tamanho do texto
+function limitarTexto(texto, maxLen) {
+  if (!texto) return '';
+  return texto.substring(0, maxLen);
+}
+
+// Controle de spam - limita pedidos por minuto
+var ultimoTempoPedido = 0;
+function podeFazerPedido() {
+  var agora = Date.now();
+  var diff = agora - ultimoTempoPedido;
+  if (diff < 5000) { // 5 segundos entre pedidos
+    return false;
+  }
+  ultimoTempoPedido = agora;
+  return true;
+}
+
+// ============ TOAST / NOTIFICACAO ============
+var toastTimeout = null;
+function showToast(msg, type) {
+  var toast = document.getElementById('toast');
+  var toastMsg = document.getElementById('toastMsg');
+  if (!toast || !toastMsg) return;
+  toast.className = 'toast toast-' + (type || 'error');
+  toastMsg.textContent = msg;
+  toast.classList.add('show');
+  // Auto-esconde após 5s
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(function() { hideToast(); }, 5000);
+}
+function hideToast() {
+  var toast = document.getElementById('toast');
+  if (toast) toast.classList.remove('show');
+  if (toastTimeout) clearTimeout(toastTimeout);
+}
+// Formata campo de numero (aceita numeros, S/N, sn)
+function formatarNumero(input) {
+  var valor = input.value.toUpperCase().replace(/[^0-9SN]/g, '');
+  if (valor.length > 10) valor = valor.substring(0, 10);
+  input.value = valor;
+}
+// Contador de caracteres para observacao
+function contarCaracteres(input, countId) {
+  var count = document.getElementById(countId);
+  if (count) count.textContent = input.value.length + '/250';
+}
+// Valida telefone brasileiro (10 ou 11 digitos, DDD valido)
+function validarTelefone(tel) {
+  var clean = tel.replace(/\D/g, '');
+  if (clean.length < 10 || clean.length > 11) return false;
+  // DDD nao pode ser 00
+  var ddd = clean.substring(0, 2);
+  if (ddd === '00') return false;
+  // Celular com 9 na frente: o primeiro digito do numero nao pode ser 0
+  if (clean.length === 11 && clean[2] === '0') return false;
+  return true;
+}
+
+// Valida endereço (rua, numero, bairro, cidade)
+function validarEndereco(rua, numero, bairro, cidade) {
+  // Rua precisa ter pelo menos 3 caracteres e não ser só números
+  if (!rua || rua.trim().length < 3) return 'Informe o nome da rua (mínimo 3 caracteres).';
+  var ruaLimpa = rua.trim().replace(/[^a-zA-Z]/g, '');
+  if (ruaLimpa.length < 2) return 'O nome da rua precisa conter letras.';
+  // Número precisa ter pelo menos 1 caractere (pode ser "S/N", "123", etc.)
+  if (!numero || numero.trim().length < 1) return 'Informe o número ou S/N.';
+  // Bairro precisa ter pelo menos 3 caracteres
+  if (!bairro || bairro.trim().length < 3) return 'Informe o bairro (mínimo 3 caracteres).';
+  var bairroLimpo = bairro.trim().replace(/[^a-zA-Z]/g, '');
+  if (bairroLimpo.length < 2) return 'O nome do bairro precisa conter letras.';
+  // Cidade precisa ter pelo menos 3 caracteres
+  if (!cidade || cidade.trim().length < 3) return 'Informe a cidade.';
+  var cidadeLimpa = cidade.trim().replace(/[^a-zA-Z]/g, '');
+  if (cidadeLimpa.length < 2) return 'O nome da cidade precisa conter letras.';
+  return null; // Tudo válido
+}
+
+var STATUS_PEDIDO = {
+  recebido: { nome: 'Recebido', class: 'recebido', icon: '📥' },
+  confirmado: { nome: 'Confirmado', class: 'confirmado', icon: '✅' },
+  em_preparo: { nome: 'Em Preparo', class: 'em_preparo', icon: '👨‍🍳' },
+  no_forno: { nome: 'No Forno', class: 'no_forno', icon: '🔥' },
+  saiu_entrega: { nome: 'Saiu p/ Entrega', class: 'saiu_entrega', icon: '🛵' },
+  retirou: { nome: 'Retirou', class: 'retirou', icon: '🏪' },
+  entregue: { nome: 'Entregue', class: 'entregue', icon: '🎉' },
+  cancelado: { nome: 'Cancelado', class: 'cancelado', icon: '❌' }
+};
+
+function enviarWhatsApp() {
+  var nome = document.getElementById('nome').value.trim();
+  var telefone = document.getElementById('telefone').value.trim();
+  if (!nome || !telefone) { alert('Preencha nome e telefone primeiro!'); return; }
+  var msg = '🍕 Novo Pedido - Cliente: ' + nome + ' | Tel: ' + telefone;
+  var url = 'https://wa.me/' + APP_CONFIG.whatsapp + '?text=' + encodeURIComponent(msg);
+  if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+    window.open(url, '_system');
+  } else {
+    window.open(url, '_blank');
+  }
+}
+
+function submitOrder() {
+  console.log('[SUBMIT] submitOrder chamado!');
+  // Controle de spam
+  if (!podeFazerPedido()) { showToast('Aguarde alguns segundos antes de fazer outro pedido.', 'error'); return; }
+  var nome = document.getElementById('nome').value.trim();
+  var telefone = document.getElementById('telefone').value.trim();
+  var rua = document.getElementById('rua').value.trim();
+  var numero = document.getElementById('numero').value.trim();
+  var bairro = document.getElementById('bairro').value.trim();
+  var cidade = document.getElementById('cidade').value.trim();
+  var cep = document.getElementById('cep').value.trim();
+  var complemento = document.getElementById('complemento').value.trim();
+  var referencia = document.getElementById('referencia').value.trim();
+  var obs = document.getElementById('obs').value.trim();
+  var pay = document.querySelector('.pay-btn.active') ? document.querySelector('.pay-btn.active').dataset.pay : 'dinheiro';
+  var troco = document.getElementById('troco').value.trim();
+  var total = 0; for (var i = 0; i < cart.length; i++) total += cart[i].preco * cart[i].qty;
+  if (!nome || nome.trim().split(/\s+/).length < 2) { showToast('Informe nome e sobrenome.', 'error'); return; }
+  var telClean = telefone.replace(/\D/g,'');
+  if (!validarTelefone(telefone)) { showToast('Informe um telefone válido com DDD (ex: 19 99999-9999).', 'error'); return; }
+  if (!retirada) {
+    if (!rua || !numero || !bairro) { showToast('Preencha o endereço completo.', 'error'); return; }
+    var erroEndereco = validarEndereco(rua, numero, bairro, cidade);
+    if (erroEndereco) { showToast(erroEndereco, 'error'); return; }
+    if (!cep || !validarCEP(cep)) { showToast('Informe um CEP válido (8 dígitos).', 'error'); return; }
+    if (!zonaAtual) { showToast('Não foi possível calcular a entrega. Verifique o CEP.', 'error'); return; }
+    if (total < APP_CONFIG.pedidoMinimo) { MIN_PEDIDO_ENTREGA = APP_CONFIG.pedidoMinimo; showToast('Valor mínimo para entrega: R$ ' + MIN_PEDIDO_ENTREGA.toFixed(2) + '.', 'error'); return; }
+  }
+  if (pay === 'dinheiro' && !troco) { showToast('Informe o valor em mãos para calcular o troco.', 'error'); return; }
+  if (pay === 'dinheiro' && troco) {
+    var trocoNum = parseTroco(troco);
+    var entrega = retirada ? 0 : (zonaAtual ? zonaAtual.valor : 0);
+    var totalFinal = total + entrega;
+    if (trocoNum < totalFinal) { showToast('Valor em mãos (R$ ' + troco + ') é menor que o total (R$ ' + totalFinal.toFixed(2) + ').', 'error'); return; }
+  }
+  // Sanitiza todos os textos para evitar XSS
+  nome = sanitizarTexto(limitarTexto(nome, 100));
+  telefone = sanitizarTexto(telefone);
+  rua = sanitizarTexto(limitarTexto(rua, 150));
+  numero = sanitizarTexto(limitarTexto(numero, 20));
+  bairro = sanitizarTexto(limitarTexto(bairro, 100));
+  cidade = sanitizarTexto(limitarTexto(cidade, 100));
+  complemento = sanitizarTexto(limitarTexto(complemento, 200));
+  referencia = sanitizarTexto(limitarTexto(referencia, 200));
+  obs = sanitizarTexto(limitarTexto(obs, 250));
+
+  contadorPedidos++; localStorage.setItem('contadorPedidos', contadorPedidos);
+  var pedidoId = String(contadorPedidos);
+  var entrega = retirada ? 0 : (zonaAtual ? zonaAtual.valor : 0);
+  var totalFinal = total + entrega;
+  var enderecoObj = retirada ? { retirada: true } : { cep: cep, rua: rua, numero: numero, bairro: bairro, cidade: cidade, complemento: complemento, referencia: referencia };
+  var itensAPI = cart.slice().map(function(it) { return { nome: it.nome, tamanho: it.tamanho, preco: it.preco, qty: it.qty }; });
+  var pedido = { id: pedidoId, deviceId: deviceId, nome: nome, telefone: telefone, endereco: enderecoObj, itens: cart.slice(), pagamento: pay, troco: troco, total: total, entrega: entrega, totalFinal: totalFinal, obs: obs, status: 'recebido', data: new Date().toISOString() };
+  var pedidos = JSON.parse(localStorage.getItem('pizzaPedidos') || '[]'); pedidos.push(pedido); localStorage.setItem('pizzaPedidos', JSON.stringify(pedidos)); localStorage.setItem('ultimoTelefone', telefone); ultimoPedidoId = pedidoId;
+
+  // Envia para Google Sheets via hidden iframe + form submit (workaround CORS)
+  if (usandoAPI) {
+    var pedidoAPI = { nome: nome, telefone: telefone, endereco: enderecoObj, itens: itensAPI, pagamento: pay, troco: troco, obs: obs, entrega: entrega, data: pedido.data };
+    enviarPedidoForm(pedidoAPI);
+  }
+
+  var msg = '🍕 *NOVO PEDIDO*%0A%0A👤 *Cliente:* ' + nome + '%0A📱 *Telefone:* ' + telefone + '%0A%0A';
+  if (retirada) { msg += '🏪 *RETIRADA NA PIZZARIA*%0A%0A'; } else { msg += '🛵 *Entrega*' + '%0A%0A'; }
+  msg += '📦 *Itens:*%0A';
+  for (var i = 0; i < cart.length; i++) { var it = cart[i]; msg += '• ' + it.qty + 'x ' + it.nome + ' (' + it.tamanho + ') - R$ ' + (it.preco * it.qty).toFixed(2) + '%0A'; }
+  msg += '%0A💰 *Subtotal:* R$ ' + total.toFixed(2) + '%0A';
+  if (!retirada) { msg += '🛵 *Entrega:* ' + (entrega === 0 ? 'GRATIS' : 'R$ ' + entrega.toFixed(2)) + '%0A'; }
+  if (pay === 'dinheiro' && troco) msg += '💵 *Troco para:* R$ ' + troco + '%0A';
+  msg += '💵 *TOTAL:* R$ ' + totalFinal.toFixed(2) + '%0A%0A';
+  var pagNome = { dinheiro: 'Dinheiro', pix: 'PIX', 'cartao-credito': 'Cartao Credito', 'cartao-debito': 'Cartao Debito' };
+  msg += '💳 *Pagamento:* ' + (pagNome[pay] || pay) + '%0A%0A';
+  if (!retirada) { msg += '📍 *Endereco:*%0A' + rua + ', ' + numero; if (complemento) msg += ' ' + complemento; msg += ' - ' + bairro + ', ' + cidade + '%0A'; if (referencia) msg += 'Ref: ' + referencia + '%0A'; }
+  else { msg += '🏪 *Retirada:* Rua Luiz Razera, 300 - Jd. Elite, Piracicaba-SP%0A'; }
+  if (obs) msg += '%0A📝 ' + obs + '%0A';
+  cart = []; updateCartButton();
+  document.getElementById('checkoutError').style.display = 'none';
+  document.getElementById('checkoutForm').style.display = 'none';
+  document.getElementById('retiradaToggle').style.display = 'none';
+  document.getElementById('checkoutSuccess').style.display = 'block';
+  var pedidoNumEl = document.getElementById('pedidoNum');
+  if (pedidoNumEl) pedidoNumEl.textContent = '';
+  var waLinkEl = document.getElementById('waLink');
+  if (waLinkEl) waLinkEl.href = 'https://wa.me/' + APP_CONFIG.whatsapp + '?text=' + encodeURIComponent(msg);
+  // Cria ongoing notification do pedido + som
+  playNotificationSound();
+  updateOngoingNotification(pedido);
+  var cardHtml = '<div style="background:#1a1a1a;border-radius:12px;padding:16px;border-left:3px solid #581c87">';
+  cardHtml += '<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="color:#f59e0b;font-size:13px">📥 Recebido</span></div>';
+  cardHtml += '<div style="font-size:13px;color:#a1a1a1;margin-bottom:8px">';
+  for (var i = 0; i < pedido.itens.length; i++) { cardHtml += '• ' + pedido.itens[i].qty + 'x ' + pedido.itens[i].nome + ' (' + pedido.itens[i].tamanho + ')<br>'; }
+  cardHtml += '</div>';
+  cardHtml += '<div style="display:flex;justify-content:space-between;border-top:1px solid rgba(88,28,135,.2);padding-top:8px">';
+  var cardEntrega = pedido.endereco && pedido.endereco.retirada ? '🏪 Retirada' : 'Entrega: ' + (pedido.entrega === 0 ? 'GRATIS' : 'R$ ' + pedido.entrega.toFixed(2));
+  cardHtml += '<span style="color:#a1a1a1;font-size:12px">' + cardEntrega + '</span>';
+  if (usandoAPI) { cardHtml += '<span style="font-size:11px;color:#4ade80">🟢 Sincronizado</span>'; }
+  cardHtml += '<strong style="color:#a855f7">R$ ' + pedido.totalFinal.toFixed(2) + '</strong></div>';
+  cardHtml += '</div>';
+  document.getElementById('pedidoCardUsuario').innerHTML = cardHtml;
+}
+
+function showError(msg) { showToast(msg, 'error'); }
+
+// Matching de pedidoId: usa ID direto primeiro, depois data/horario, depois telefone+nome+dia
+function matchPedidoApi(localP, apiPedidos) {
+  if (!apiPedidos || apiPedidos.length === 0) return null;
+  if (!localP.data) return null;
+  var localTime = new Date(localP.data).getTime();
+  // 1) Match por data/horario ±5s (strict)
+  var matchProx = apiPedidos.find(function(a) {
+    if (!a.data) return false;
+    return Math.abs(new Date(a.data).getTime() - localTime) < 5000;
+  });
+  if (matchProx) return matchProx;
+  // 2) Match por data/horario ±30s (generous - captura delay do GAS)
+  matchProx = apiPedidos.find(function(a) {
+    if (!a.data) return false;
+    return Math.abs(new Date(a.data).getTime() - localTime) < 30000;
+  });
+  if (matchProx) return matchProx;
+  // 3) Ultimo recurso: nome + telefone + dia (sem restricao de horario)
+  if (localP.telefone && localP.nome) {
+    var telLocal = localP.telefone.replace(/\D/g, '');
+    var nomeLocal = localP.nome.trim().toLowerCase();
+    var diaLocal = localP.data.substring(0, 10);
+    var candidatos = apiPedidos.filter(function(a) {
+      if (!a.telefone || !a.nome || !a.data) return false;
+      if (a.status === 'entregue' || a.status === 'retirou' || a.status === 'cancelado') return false;
+      if (a.telefone.replace(/\D/g, '') !== telLocal) return false;
+      if (a.nome.trim().toLowerCase() !== nomeLocal) return false;
+      return a.data.substring(0, 10) === diaLocal;
+    });
+    if (candidatos.length >= 1) {
+      return candidatos[0];
+    }
+  }
+  return null;
+}
+
+
+function carregarPedidos() {
+  var pedidos = JSON.parse(localStorage.getItem('pizzaPedidos') || '[]');
+  // Filtra apenas os pedidos feitos neste dispositivo
+  var meusPedidos = pedidos.filter(function(p) { return p && p.deviceId === deviceId; });
+  var emAndamento = meusPedidos.filter(function(p) { return p.status && p.status !== 'entregue' && p.status !== 'retirou' && p.status !== 'cancelado'; });
+  var el = document.getElementById('meusPedidos');
+  var section = document.getElementById('meusPedidosSection');
+  if (!el || !section) return;
+  
+  var cardapio = document.getElementById('cardapio');
+  if (!cardapio || cardapio.style.display === 'none') { section.style.display = 'none'; return; }
+  if (emAndamento.length === 0) { section.style.display = 'none'; el.innerHTML = ''; return; }
+  section.style.display = 'block';
+  var h = '';
+  for (var i = emAndamento.length - 1; i >= 0; i--) {
+    var p = emAndamento[i]; var st = STATUS_PEDIDO[p.status] || STATUS_PEDIDO.recebido;
+    h += '<div class="pedido-card ' + st.class + '" style="margin-bottom:12px">';
+    h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="status-badge ' + st.class + '">' + st.icon + ' ' + st.nome + '</span></div>';
+    h += '<div style="font-size:12px;color:#a1a1a1;margin-bottom:8px">' + (p.nome ? '👤 ' + p.nome + ' • ' : '') + new Date(p.data).toLocaleString('pt-BR') + '</div>';
+    h += '<div style="font-size:13px;margin-bottom:4px">';
+    if (p.itens) { for (var j = 0; j < p.itens.length; j++) { h += '• ' + p.itens[j].qty + 'x ' + p.itens[j].nome + ' (' + p.itens[j].tamanho + ')<br>'; } }
+    h += '</div>';
+    var endInfo = p.endereco && p.endereco.retirada ? '🏪 Retirada' : ('Entrega: ' + (p.entrega === 0 ? 'GRATIS' : 'R$ ' + p.entrega.toFixed(2)));
+    h += '<div style="display:flex;justify-content:space-between;border-top:1px solid rgba(88,28,135,.2);padding-top:8px"><span style="color:#a1a1a1;font-size:12px">' + endInfo + '</span><strong style="color:#a855f7">R$ ' + (p.totalFinal||0).toFixed(2) + '</strong></div>';
+    h += '</div>';
+  }
+  el.innerHTML = h;
+  // Se online, busca atualizacoes da API em background
+  if (usandoAPI) {
+    carregarPedidosAPI().then(function(apiPedidos) {
+      if (apiPedidos && apiPedidos.length > 0) {
+        console.log('[POLLING] API retornou', apiPedidos.length, 'pedidos');
+        // Verifica se houve alteracao local recente (menos de 30s) e preserva
+        var ultimaAlt = JSON.parse(localStorage.getItem('ultimaAlteracaoStatus') || 'null');
+        var agora = Date.now();
+        if (ultimaAlt && (agora - ultimaAlt.time < 30000)) {
+          for (var i = 0; i < apiPedidos.length; i++) {
+            if (apiPedidos[i].id == ultimaAlt.id) {
+              console.log('[POLLING] Preservando alteracao local:', ultimaAlt.id, ultimaAlt.status);
+              apiPedidos[i].status = ultimaAlt.status;
+              break;
+            }
+          }
+        }
+        var locais = JSON.parse(localStorage.getItem('pizzaPedidos') || '[]');
+        var meusLocais = locais.filter(function(p) { return p && p.deviceId === deviceId; });
+        console.log('[POLLING] Meus pedidos locais:', meusLocais.length);
+        var idsApiUsados = []; // IDs da API ja atribuidos (evita duplicata)
+        // Para cada pedido local, tenta encontrar o pedidoId correto na API
+        var meusAtualizados = meusLocais.map(function(p) {
+          var match = matchPedidoApi(p, apiPedidos.filter(function(a) { return idsApiUsados.indexOf(a.id) < 0; }));
+          if (match) {
+            idsApiUsados.push(match.id);
+            // So atualiza se o status for DIFERENTE do local (evita match errado)
+            if (match.status && match.status !== p.status) {
+              return Object.assign({}, p, { id: String(match.id), status: match.status });
+            }
+          }
+          return p;
+        });
+        // Pedidos da API que nao sao meus (de outros dispositivos)
+        var idsMeusNovos = meusAtualizados.map(function(p) { return p.id; });
+        var idsIgnorados = JSON.parse(localStorage.getItem('pizzaPedidosIgnorados') || '[]');
+        var deOutros = apiPedidos.filter(function(a) { return idsMeusNovos.indexOf(String(a.id)) < 0 && idsIgnorados.indexOf(String(a.id)) < 0; });
+        var merged = deOutros.concat(meusAtualizados);
+        // Sincroniza contador com o maior ID da API
+        for (var j = 0; j < apiPedidos.length; j++) {
+          var numId = parseInt(apiPedidos[j].id);
+          if (!isNaN(numId) && numId > contadorPedidos) {
+            contadorPedidos = numId;
+          }
+        }
+        localStorage.setItem('contadorPedidos', contadorPedidos);
+        // Atualiza localStorage com o merge
+        localStorage.setItem('pizzaPedidos', JSON.stringify(merged));
+          // Atualiza ongoing notification conforme status do pedido
+          var statusAnterior = JSON.parse(localStorage.getItem('pizzaPedidosStatus') || '{}');
+          var qtdNotificacoes = 0;
+          for (var m = 0; m < meusAtualizados.length; m++) {
+            var pedidoAtual = meusAtualizados[m];
+            var statusAnt = statusAnterior[pedidoAtual.id];
+            // So notifica se o status da API for diferente do que ja temos localmente
+            // Isso evita notificacoes duplicadas quando o status ja foi atualizado
+            if (statusAnt && statusAnt !== pedidoAtual.status) {
+              // Incrementa contador para limitar a 1 notificacao por mudanca de status
+              if (qtdNotificacoes === 0) {
+                updateOngoingNotification(pedidoAtual);
+                qtdNotificacoes++;
+              }
+            }
+            // Cancela ongoing quando pedido e finalizado
+            if (['entregue','cancelado','retirou'].indexOf(pedidoAtual.status) >= 0 && statusAnt && statusAnt !== pedidoAtual.status) {
+              cancelOngoingNotification();
+            }
+          }
+          // Salva status atuais para proxima comparacao
+        var novosStatus = {};
+        for (var s = 0; s < meusAtualizados.length; s++) {
+          novosStatus[meusAtualizados[s].id] = meusAtualizados[s].status;
+        }
+        localStorage.setItem('pizzaPedidosStatus', JSON.stringify(novosStatus));
+        // Re-renderiza
+        carregarPedidos();
+      }
+    });
+  }
+}
+
+function showAdminLogin() { var senha = prompt('Senha admin:'); if (senha === APP_CONFIG.senhaAdmin) { document.getElementById('adminPage').style.display = 'block'; document.getElementById('cardapio').style.display = 'none'; document.getElementById('catNavMenu').style.display = 'none'; document.getElementById('checkoutPage').style.display = 'none'; document.getElementById('meusPedidosSection').style.display = 'none'; carregarAdminPedidos(); } }
+
+var adminPedidosCarregados = false;
+
+async function carregarAdminPedidos() {
+  var pedidos = [];
+  // So busca da API na primeira vez
+  if (usandoAPI && !adminPedidosCarregados) {
+    var apiPedidos = await carregarPedidosAPI();
+    console.log('[ADMIN] Pedidos da API:', apiPedidos);
+    if (apiPedidos && apiPedidos.length > 0) {
+      pedidos = apiPedidos;
+      localStorage.setItem('pizzaPedidos', JSON.stringify(pedidos));
+      adminPedidosCarregados = true;
+    }
+  }
+  if (pedidos.length === 0) {
+    pedidos = JSON.parse(localStorage.getItem('pizzaPedidos') || '[]');
+  }
+  var el = document.getElementById('adminPedidosList');
+  if (!el) return;
+  
+  var recebidos = pedidos.filter(function(p) { return p.status === 'recebido'; }).length;
+  var confirmados = pedidos.filter(function(p) { return p.status === 'confirmado'; }).length;
+  var preparo = pedidos.filter(function(p) { return p.status === 'em_preparo'; }).length;
+  var forno = pedidos.filter(function(p) { return p.status === 'no_forno'; }).length;
+  var saiu = pedidos.filter(function(p) { return p.status === 'saiu_entrega'; }).length;
+  var entregues = pedidos.filter(function(p) { return p.status === 'entregue' || p.status === 'retirou'; }).length;
+  var sR = document.getElementById('statRecebido'); if (sR) sR.textContent = recebidos;
+  var sC = document.getElementById('statConfirmado'); if (sC) sC.textContent = confirmados;
+  var sP = document.getElementById('statPreparo'); if (sP) sP.textContent = preparo;
+  var sF = document.getElementById('statForno'); if (sF) sF.textContent = forno;
+  var sS = document.getElementById('statSaiu'); if (sS) sS.textContent = saiu;
+  var sE = document.getElementById('statEntregue'); if (sE) sE.textContent = entregues;
+  if (pedidos.length === 0) { el.innerHTML = '<div style="text-align:center;color:#a1a1a1;padding:20px">Nenhum pedido recebido</div>'; document.getElementById('adminPedidoDetalhe').innerHTML = ''; return; }
+  var h = '';
+  var temPedido = false;
+  for (var i = 0; i < pedidos.length; i++) {
+    var p = pedidos[i];
+    if (!p || !p.id) continue;
+    var st = STATUS_PEDIDO[p.status] || STATUS_PEDIDO.recebido;
+    temPedido = true;
+    var endereco = (typeof p.endereco === 'object') ? p.endereco : {};
+    h += '<div class="pedido-card ' + st.class + '" style="cursor:pointer;margin-bottom:12px" onclick="verPedidoAdmin(\'' + p.id + '\')">';
+    h += '<div style="display:flex;justify-content:space-between"><strong>' + p.id + '</strong><span class="status-badge ' + st.class + '">' + st.icon + ' ' + st.nome + '</span></div>';
+    h += '<div style="font-size:12px;color:#a1a1a1;margin-top:4px">👤 ' + (p.nome||'') + ' - 📱 ' + (p.telefone||'') + '</div>';
+    if (endereco.retirada) { h += '<div style="font-size:12px;color:#f59e0b;margin-top:4px">🏪 RETIRADA NA PIZZARIA</div>'; } else { h += '<div style="font-size:12px;color:#a1a1a1">📍 ' + (endereco.rua||'') + ' - ' + (endereco.bairro||'') + '</div>'; }
+    h += '<div style="font-size:12px;color:#a1a1a1;margin-top:4px">';
+    if (p.itens) {
+      if (typeof p.itens === 'string') {
+        try { p.itens = JSON.parse(p.itens); } catch(e) {}
+      }
+      if (Array.isArray(p.itens)) {
+        for (var j = 0; j < p.itens.length; j++) { h += '• ' + (p.itens[j].qty||1) + 'x ' + (p.itens[j].nome||'') + ' (' + (p.itens[j].tamanho||'') + ')<br>'; }
+      }
+    }
+    h += '</div>';
+    h += '<div style="display:flex;justify-content:space-between;border-top:1px solid rgba(88,28,135,.2);padding-top:8px;margin-top:8px">';
+    h += '<span style="color:#a1a1a1;font-size:12px">💳 ' + (p.pagamento === 'dinheiro' ? 'Dinheiro' : (p.pagamento||'')) + '</span>';
+    var pf = typeof p.totalFinal === 'number' ? p.totalFinal : parseFloat(p.totalFinal) || 0;
+    h += '<strong style="color:#a855f7">R$ ' + pf.toFixed(2) + '</strong></div>';
+    if (p.pagamento === 'dinheiro' && p.troco) { var trocoVal = parseFloat(p.troco) - pf; h += '<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:8px 12px;margin-top:6px;font-size:13px;color:#f59e0b;font-weight:600">💵 Troco: R$ ' + trocoVal.toFixed(2) + '</div>'; }
+    h += '</div>';
+  }
+  if (!temPedido) { el.innerHTML = '<div style="text-align:center;color:#a1a1a1;padding:20px">Nenhum pedido em andamento</div>'; }
+  else { el.innerHTML = h; }
+}
+
+function verPedidoAdmin(id) {
+  var pedidos = JSON.parse(localStorage.getItem('pizzaPedidos') || '[]'); var p = pedidos.find(function(x) { return x.id == id; }); if (!p) return;
+  var st = STATUS_PEDIDO[p.status] || STATUS_PEDIDO.recebido;
+  var h = '<h3 style="margin-bottom:16px">' + p.id + ' - ' + st.icon + ' ' + st.nome + '</h3>';
+  h += '<div style="background:#0a0a0a;border-radius:12px;padding:16px;margin-bottom:16px"><h4 style="color:#a855f7;margin-bottom:8px">👤 Cliente</h4><p><strong>Nome:</strong> ' + (p.nome||'') + '</p><p><strong>Telefone:</strong> ' + (p.telefone||'') + '</p></div>';
+  if (p.endereco && p.endereco.retirada) { h += '<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:16px;margin-bottom:16px"><h4 style="color:#f59e0b;margin-bottom:8px">🏪 Retirada na Pizzaria</h4><p style="font-size:13px;color:#a1a1a1">Rua Luiz Razera, 300 - Jardim Elite, Piracicaba-SP</p><p style="font-size:12px;color:#4ade80;margin-top:4px">Sem taxa de entrega</p></div>'; } else { h += '<div style="background:#0a0a0a;border-radius:12px;padding:16px;margin-bottom:16px"><h4 style="color:#a855f7;margin-bottom:8px">📍 Endereço</h4><p>' + (p.endereco?p.endereco.rua:'') + '</p>'; if (p.endereco && p.endereco.complemento) h += '<p>Complemento: ' + p.endereco.complemento + '</p>'; h += '<p>' + (p.endereco?p.endereco.bairro:'') + '</p>'; if (p.endereco && p.endereco.referencia) h += '<p>Ref: ' + p.endereco.referencia + '</p></div>'; }
+  h += '<div style="background:#0a0a0a;border-radius:12px;padding:16px;margin-bottom:16px"><h4 style="color:#a855f7;margin-bottom:8px">📦 Itens</h4>'; if(p.itens){for(var i=0;i<p.itens.length;i++){var it=p.itens[i];h+='<p>'+(it.qty||1)+'x '+(it.nome||'')+' ('+(it.tamanho||'')+') - R$ '+((it.preco||0)*(it.qty||1)).toFixed(2)+'</p>';}} h += '</div>';
+  var pagNome = { dinheiro: 'Dinheiro', pix: 'PIX', 'cartao-credito': 'Cartao Credito', 'cartao-debito': 'Cartao Debito' };
+  var pf = parseFloat(p.totalFinal)||0;
+  var subtotal = parseFloat(p.total)||0;
+  var entrega = parseFloat(p.entrega)||0;
+  h += '<div style="background:#0a0a0a;border-radius:12px;padding:16px;margin-bottom:16px"><h4 style="color:#a855f7;margin-bottom:8px">💰 Pagamento</h4><p><strong>Forma:</strong> ' + (pagNome[p.pagamento] || p.pagamento||'') + '</p>'; if (p.pagamento === 'dinheiro' && p.troco) { var trocoVal = parseFloat(p.troco) - pf; h += '<p><strong>Cliente paga:</strong> R$ ' + parseFloat(p.troco).toFixed(2) + '</p>'; h += '<div style="background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);border-radius:8px;padding:10px 12px;margin-top:6px;font-size:15px;color:#f59e0b;font-weight:700">💵 Troco: R$ ' + trocoVal.toFixed(2) + '</div>'; } else if (p.troco) { h += '<p><strong>Troco para:</strong> R$ ' + p.troco + '</p>'; } h += '<p><strong>Subtotal:</strong> R$ ' + subtotal.toFixed(2) + '</p><p><strong>Entrega:</strong> ' + (entrega === 0 ? 'GRATIS' : 'R$ ' + entrega.toFixed(2)) + '</p><p style="font-size:18px;color:#a855f7"><strong>TOTAL: R$ ' + pf.toFixed(2) + '</strong></p></div>';
+  if (p.obs) { h += '<div style="background:#0a0a0a;border-radius:12px;padding:16px;margin-bottom:16px"><h4 style="color:#a855f7;margin-bottom:8px">📝 Observação</h4><p>' + p.obs + '</p></div>'; }
+  h += '<h4 style="color:#a855f7;margin-bottom:12px">🔄 Alterar Status</h4><div style="display:flex;flex-wrap:wrap;gap:8px" id="statusBtns">';
+  var statuses = ['recebido','confirmado','em_preparo','no_forno','entregue','cancelado'];
+  if (!p.endereco || !p.endereco.retirada) { statuses.splice(statuses.indexOf('entregue'), 0, 'saiu_entrega', 'retirou'); }
+  else { statuses.splice(statuses.indexOf('entregue'), 0, 'retirou'); }
+  for (var s = 0; s < statuses.length; s++) { var ss = STATUS_PEDIDO[statuses[s]]; if (!ss) continue; var bg = p.status === statuses[s] ? '#581c87' : '#1a1a1a'; var color = p.status === statuses[s] ? '#fff' : '#a1a1a1'; h += '<button data-pedido-id="' + String(id) + '" data-status="' + statuses[s] + '" class="status-btn" style="padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-size:13px;background:' + bg + ';color:' + color + '">' + ss.icon + ' ' + ss.nome + '</button>'; }
+  h += '</div>';
+  document.getElementById('adminPedidoDetalhe').innerHTML = h;
+  document.getElementById('adminPage').style.display = 'none';
+  document.getElementById('adminPedidoDetail').style.display = 'block';
+}
+
+function alterarStatus(id, status) {
+  console.log('[ALTERAR STATUS] id:', id, 'status:', status);
+  var pedidos = JSON.parse(localStorage.getItem('pizzaPedidos') || '[]');
+  var p = pedidos.find(function(x) { return String(x.id) == String(id); });
+  if (p) {
+    console.log('[ALTERAR STATUS] Pedido encontrado:', p.id, 'status atual:', p.status);
+    p.status = status;
+    p._statusManual = true;
+    localStorage.setItem('pizzaPedidos', JSON.stringify(pedidos));
+    localStorage.setItem('ultimaAlteracaoStatus', JSON.stringify({ id: id, status: status, time: Date.now() }));
+    var apiId = String(p.id).replace('#', '');
+    if (usandoAPI && apiId) { atualizarStatusAPI(apiId, status); }
+    // Notificacao sera enviada pelo polling do usuario quando detectar a mudanca
+    carregarAdminPedidosLocal();
+    verPedidoAdmin(id);
+    carregarPedidos();
+    console.log('[ALTERAR STATUS] Concluido. Novo status:', status);
+  } else {
+    console.log('[ALTERAR STATUS] Pedido NAO encontrado. IDs:', pedidos.map(function(x){return x.id;}));
+  }
+}
+
+function limparPedidosEntregues() {
+  var pedidos = JSON.parse(localStorage.getItem('pizzaPedidos') || '[]');
+  var restantes = pedidos.filter(function(p) {
+    return p.status !== 'entregue' && p.status !== 'retirou' && p.status !== 'cancelado';
+  });
+  var removidos = pedidos.length - restantes.length;
+  if (removidos === 0) { alert('Nenhum pedido entregue para limpar.'); return; }
+  if (confirm('Limpar ' + removidos + ' pedido(s) entregue(s)/retirado(s)?\n\nOs pedidos em andamento serao mantidos.')) {
+    // Salva os IDs removidos para o polling nao trazer de volta
+    var idsRemovidos = pedidos.filter(function(p) {
+      return p.status === 'entregue' || p.status === 'retirou' || p.status === 'cancelado';
+    }).map(function(p) { return String(p.id); });
+    var idsIgnorados = JSON.parse(localStorage.getItem('pizzaPedidosIgnorados') || '[]');
+    idsIgnorados = idsIgnorados.concat(idsRemovidos);
+    localStorage.setItem('pizzaPedidosIgnorados', JSON.stringify(idsIgnorados));
+    localStorage.setItem('pizzaPedidos', JSON.stringify(restantes));
+    carregarAdminPedidosLocal();
+    carregarPedidos();
+  }
+}
+
+function carregarAdminPedidosLocal() {
+  var pedidos = JSON.parse(localStorage.getItem('pizzaPedidos') || '[]');
+  var el = document.getElementById('adminPedidosList');
+  if (!el) return;
+  // Stats
+  var recebidos = pedidos.filter(function(p) { return p.status === 'recebido'; }).length;
+  var confirmados = pedidos.filter(function(p) { return p.status === 'confirmado'; }).length;
+  var preparo = pedidos.filter(function(p) { return p.status === 'em_preparo'; }).length;
+  var forno = pedidos.filter(function(p) { return p.status === 'no_forno'; }).length;
+  var saiu = pedidos.filter(function(p) { return p.status === 'saiu_entrega'; }).length;
+  var entregues = pedidos.filter(function(p) { return p.status === 'entregue' || p.status === 'retirou'; }).length;
+  var sR = document.getElementById('statRecebido'); if (sR) sR.textContent = recebidos;
+  var sC = document.getElementById('statConfirmado'); if (sC) sC.textContent = confirmados;
+  var sP = document.getElementById('statPreparo'); if (sP) sP.textContent = preparo;
+  var sF = document.getElementById('statForno'); if (sF) sF.textContent = forno;
+  var sS = document.getElementById('statSaiu'); if (sS) sS.textContent = saiu;
+  var sE = document.getElementById('statEntregue'); if (sE) sE.textContent = entregues;
+  if (pedidos.length === 0) { el.innerHTML = '<div style="text-align:center;color:#a1a1a1;padding:20px">Nenhum pedido recebido</div>'; document.getElementById('adminPedidoDetalhe').innerHTML = ''; return; }
+  var h = '';
+  var temPedido = false;
+  for (var i = 0; i < pedidos.length; i++) {
+    var p = pedidos[i];
+    if (!p || !p.id) continue;
+    var st = STATUS_PEDIDO[p.status] || STATUS_PEDIDO.recebido;
+    temPedido = true;
+    var endereco = (typeof p.endereco === 'object') ? p.endereco : {};
+    h += '<div class="pedido-card ' + st.class + '" style="cursor:pointer;margin-bottom:12px" onclick="verPedidoAdmin(\'' + p.id + '\')">';
+    h += '<div style="display:flex;justify-content:space-between"><strong>' + p.id + '</strong><span class="status-badge ' + st.class + '">' + st.icon + ' ' + st.nome + '</span></div>';
+    h += '<div style="font-size:12px;color:#a1a1a1;margin-top:4px">👤 ' + (p.nome||'') + ' - 📱 ' + (p.telefone||'') + '</div>';
+    if (endereco.retirada) { h += '<div style="font-size:12px;color:#f59e0b;margin-top:4px">🏪 RETIRADA NA PIZZARIA</div>'; } else { h += '<div style="font-size:12px;color:#a1a1a1">📍 ' + (endereco.rua||'') + ' - ' + (endereco.bairro||'') + '</div>'; }
+    h += '<div style="font-size:12px;color:#a1a1a1;margin-top:4px">';
+    if (p.itens) {
+      if (typeof p.itens === 'string') { try { p.itens = JSON.parse(p.itens); } catch(e) {} }
+      if (Array.isArray(p.itens)) { for (var j = 0; j < p.itens.length; j++) { h += '• ' + (p.itens[j].qty||1) + 'x ' + (p.itens[j].nome||'') + ' (' + (p.itens[j].tamanho||'') + ')<br>'; } }
+    }
+    h += '</div>';
+    h += '<div style="display:flex;justify-content:space-between;border-top:1px solid rgba(88,28,135,.2);padding-top:8px;margin-top:8px">';
+    h += '<span style="color:#a1a1a1;font-size:12px">💳 ' + (p.pagamento === 'dinheiro' ? 'Dinheiro' : (p.pagamento||'')) + '</span>';
+    var pf = typeof p.totalFinal === 'number' ? p.totalFinal : parseFloat(p.totalFinal) || 0;
+    h += '<strong style="color:#a855f7">R$ ' + pf.toFixed(2) + '</strong></div>';
+    if (p.pagamento === 'dinheiro' && p.troco) { var trocoVal = parseFloat(p.troco) - pf; h += '<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:8px 12px;margin-top:6px;font-size:13px;color:#f59e0b;font-weight:600">💵 Troco: R$ ' + trocoVal.toFixed(2) + '</div>'; }
+    h += '</div>';
+  }
+  if (!temPedido) { el.innerHTML = '<div style="text-align:center;color:#a1a1a1;padding:20px">Nenhum pedido em andamento</div>'; }
+  else { el.innerHTML = h; }
+}
+
+function filterAdmin(filter, btn) { document.querySelectorAll('.admin-filter').forEach(function(b) { b.style.background = '#1a1a1a'; b.style.color = '#a1a1a1'; }); btn.style.background = '#581c87'; btn.style.color = '#fff'; var pedidos = JSON.parse(localStorage.getItem('pizzaPedidos') || '[]'); var filtrados = filter === 'todos' ? pedidos : pedidos.filter(function(p) { return p.status === filter; }); var el = document.getElementById('adminPedidosList'); if (filtrados.length === 0) { el.innerHTML = '<div style="text-align:center;color:#a1a1a1;padding:20px">Nenhum pedido</div>'; return; } var h = ''; for (var i = filtrados.length - 1; i >= 0; i--) { var p = filtrados[i]; var st = STATUS_PEDIDO[p.status] || STATUS_PEDIDO.recebido; h += '<div class="pedido-card ' + st.class + '" style="cursor:pointer" onclick="verPedidoAdmin(\'' + p.id + '\')"><div style="display:flex;justify-content:space-between"><strong>' + p.id + '</strong><span class="status-badge ' + st.class + '">' + st.icon + ' ' + st.nome + '</span></div><div style="font-size:12px;color:#a1a1a1">' + p.nome + ' - ' + p.telefone + '</div><div style="font-size:13px;margin-top:4px;color:#a855f7">R$ ' + p.totalFinal.toFixed(2) + '</div>'; if (p.pagamento === 'dinheiro' && p.troco) { h += '<div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:6px 10px;margin-top:6px;font-size:12px;color:#f59e0b;font-weight:600">💵 Troco: R$ ' + p.troco + '</div>'; } h += '</div>'; } el.innerHTML = h; }
+
+function showHome() {
+  document.getElementById('checkoutPage').style.display = 'none';
+  document.getElementById('adminPage').style.display = 'none';
+  document.getElementById('adminLoginPage').style.display = 'none';
+  document.getElementById('adminPedidoDetail').style.display = 'none';
+  document.getElementById('checkoutSuccess').style.display = 'none';
+  document.getElementById('checkoutForm').style.display = 'block';
+  document.getElementById('retiradaToggle').style.display = 'flex';
+  document.getElementById('cardapio').style.display = 'block';
+  document.getElementById('catNavMenu').style.display = 'flex';
+  document.getElementById('cartBtn').style.display = 'none';
+  document.getElementById('meusPedidosSection').style.display = 'block';
+  zonaAtual = null;
+  retirada = false;
+  document.getElementById('btnEntrega').classList.add('active');
+  document.getElementById('btnRetirada').classList.remove('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  setTimeout(function() { carregarPedidos(); }, 500);
+}
+
+function goBack() { showHome(); }
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Welcome Screen setup (elemento ja existe no DOM neste ponto)
+  var ws = document.getElementById('welcomeScreen');
+  console.log('[WELCOME] Setup - elemento encontrado:', !!ws);
+  if (ws) {
+    ws.addEventListener('click', function() {
+      console.log('[WELCOME] Click recebido!');
+      // Criar AudioContext e retomar para permitir beeps
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+      } catch(e) {}
+      // Solicitar permissao de notificacao no momento do clique (Android 13+)
+      try { requestNotificationPermission(); } catch(e) {}
+      ws.style.display = 'none';
+      ws.remove();
+      showHome();
+    });
+  }
+  document.title = APP_CONFIG.nome + ' - ' + APP_CONFIG.slogan;
+  var h1 = document.querySelector("header h1");
+  if (h1) h1.innerHTML = '🍕 ' + APP_CONFIG.nome;
+  var sl = document.querySelector("header p");
+  if (sl) sl.textContent = APP_CONFIG.slogan;
+  updateHorarioHeader();
+  render();
+  updateCartButton();
+  // Carrega configuracoes da aba Config da planilha
+  carregarConfigAPI().then(function(config) {
+    if (config) {
+      if (config.taxaMaxima !== undefined) TAXA_MAXIMA = parseFloat(config.taxaMaxima) || TAXA_MAXIMA;
+      if (config.pedidoGratisMinimo !== undefined) MIN_PEDIDO_GRATIS = parseFloat(config.pedidoGratisMinimo) || MIN_PEDIDO_GRATIS;
+      if (config.valorMinimoEntrega !== undefined) MIN_PEDIDO_ENTREGA = parseFloat(config.valorMinimoEntrega) || MIN_PEDIDO_ENTREGA;
+      if (config.horarioInicio !== undefined) HORA_INICIO = parseInt(config.horarioInicio) || HORA_INICIO;
+      if (config.horarioFim !== undefined) HORA_FIM = parseInt(config.horarioFim) || HORA_FIM;
+      if (config.whatsapp !== undefined) window.WHATSAPP_NUM = config.whatsapp;
+      console.log('[Config] Carregada da planilha:', config);
+    }
+  }).catch(function(e) {
+    console.warn('[Config] Usando valores padrao:', e.message);
+  });
+  // Tenta carregar cardapio da API em background
+  carregarCardapioAPI().then(function(categoriasAPI) {
+    if (categoriasAPI && categoriasAPI.length > 0) {
+      CARDAPIO.categorias = normalizarItens(categoriasAPI);
+      usandoAPI = true;
+      console.log('[API] Cardapio carregado da planilha!');
+      render();
+      updateCartButton();
+    } else {
+      usandoAPI = false;
+      console.log('[API] Usando cardapio local (offline)');
+      render();
+    }
+  }).catch(function(e) {
+    console.warn('[API] Falha:', e.message);
+    usandoAPI = false;
+    render();
+  });
+  // Atualiza o banner de entrega gratis com o valor da config
+  var savedGratis = localStorage.getItem('configPedidoGratis');
+  if (savedGratis) {
+    var vg = document.getElementById('valorGratis');
+    if (vg) vg.textContent = parseFloat(savedGratis).toFixed(0);
+  }
+});
+// Polling de config: verifica a cada 30s se houve alteracoes na planilha
+setInterval(function() {
+  if (!usandoAPI) return;
+  carregarConfigAPI().then(function(config) {
+    if (config) {
+      var mudou = false;
+      // Verifica horario
+      if (config.horarioInicio !== undefined && parseInt(config.horarioInicio) !== HORA_INICIO) {
+        HORA_INICIO = parseInt(config.horarioInicio) || HORA_INICIO;
+        mudou = true;
+      }
+      if (config.horarioFim !== undefined && parseInt(config.horarioFim) !== HORA_FIM) {
+        HORA_FIM = parseInt(config.horarioFim) || HORA_FIM;
+        mudou = true;
+      }
+      // Verifica taxas
+      if (config.taxaMaxima !== undefined && parseFloat(config.taxaMaxima) !== TAXA_MAXIMA) {
+        TAXA_MAXIMA = parseFloat(config.taxaMaxima) || TAXA_MAXIMA;
+        mudou = true;
+      }
+      if (config.pedidoGratisMinimo !== undefined && parseFloat(config.pedidoGratisMinimo) !== MIN_PEDIDO_GRATIS) {
+        MIN_PEDIDO_GRATIS = parseFloat(config.pedidoGratisMinimo) || MIN_PEDIDO_GRATIS;
+        mudou = true;
+      }
+      if (config.valorMinimoEntrega !== undefined && parseFloat(config.valorMinimoEntrega) !== MIN_PEDIDO_ENTREGA) {
+        MIN_PEDIDO_ENTREGA = parseFloat(config.valorMinimoEntrega) || MIN_PEDIDO_ENTREGA;
+        mudou = true;
+      }
+      // Se algo mudou, atualiza a UI
+      if (mudou) {
+        updateHorarioHeader();
+        var vg = document.getElementById('valorGratis');
+        if (vg) vg.textContent = MIN_PEDIDO_GRATIS.toFixed(0);
+        localStorage.setItem('configPedidoGratis', MIN_PEDIDO_GRATIS);
+        console.log('[POLLING CONFIG] Config atualizada automaticamente');
+      }
+    }
+  }).catch(function() {});
+}, 30000);
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('.status-btn');
+  if (btn) {
+    var pedidoId = btn.getAttribute('data-pedido-id');
+    var status = btn.getAttribute('data-status');
+    if (pedidoId && status) {
+      alterarStatus(pedidoId, status);
+    }
+  }
+});
+setInterval(updateHorarioHeader, 60000);
+document.getElementById('itemModal').addEventListener('click', function(e) { if (e.target === this) this.style.display = 'none'; });
+document.getElementById('cartModal').addEventListener('click', function(e) { if (e.target === this) this.style.display = 'none'; });
+document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'visible') carregarPedidos(); });
+setInterval(carregarPedidos, 5000);
+// Polling do admin: busca da API a cada 5s se estiver na pagina admin
+setInterval(function(){
+  var adminPage = document.getElementById('adminPage');
+  var adminDetail = document.getElementById('adminPedidoDetail');
+  if (adminPage && adminPage.style.display !== 'none' && usandoAPI) {
+    carregarPedidosAPI().then(function(apiPedidos) {
+      if (apiPedidos && apiPedidos.length > 0) {
+        // Mesmo matching do carregarPedidos: data/horario + telefone
+        var locais = JSON.parse(localStorage.getItem('pizzaPedidos') || '[]');
+        var meusLocais = locais.filter(function(p) { return p && p.deviceId === deviceId; });
+        var idsApiUsados = [];
+        var meusAtualizados = meusLocais.map(function(p) {
+          var match = matchPedidoApi(p, apiPedidos.filter(function(a) { return idsApiUsados.indexOf(a.id) < 0; }));
+          if (match) {
+            idsApiUsados.push(match.id);
+            if (String(match.id) !== String(p.id)) {
+              return Object.assign({}, p, { id: String(match.id), status: match.status || p.status });
+            }
+            return Object.assign({}, p, { status: match.status || p.status });
+          }
+          return p;
+        });
+        var idsMeusNovos = meusAtualizados.map(function(p) { return p.id; });
+        var idsIgnorados = JSON.parse(localStorage.getItem('pizzaPedidosIgnorados') || '[]');
+        var deOutros = apiPedidos.filter(function(a) { return idsMeusNovos.indexOf(String(a.id)) < 0 && idsIgnorados.indexOf(String(a.id)) < 0; });
+        var merged = deOutros.concat(meusAtualizados);
+        // Sincroniza contador
+        for (var j = 0; j < apiPedidos.length; j++) {
+          var numId = parseInt(apiPedidos[j].id);
+          if (!isNaN(numId) && numId > contadorPedidos) contadorPedidos = numId;
+        }
+        localStorage.setItem('contadorPedidos', contadorPedidos);
+        localStorage.setItem('pizzaPedidos', JSON.stringify(merged));
+        carregarAdminPedidosLocal();
+      }
+    });
+  }
+}, 5000);
+</script>
+<iframe name="apiFrame" id="apiFrame" style="display:none"></iframe>
+</body>
+</html>
