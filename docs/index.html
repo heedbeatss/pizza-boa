@@ -42,38 +42,57 @@
       color: #a1a1a1;
       margin-bottom: 32px;
     }
-    .info {
+    .card {
       background: rgba(88, 28, 135, 0.15);
       border: 1px solid rgba(88, 28, 135, 0.3);
       border-radius: 16px;
-      padding: 20px;
-      max-width: 320px;
+      padding: 24px;
+      max-width: 340px;
       width: 100%;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
-    .info p {
+    .card p {
       font-size: 14px;
       color: #a1a1a1;
       margin-bottom: 8px;
     }
-    .info strong {
+    .card strong {
       color: #a855f7;
     }
-    .whatsapp {
-      display: inline-flex;
+    .links {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 340px;
+      width: 100%;
+      margin-bottom: 24px;
+    }
+    .btn {
+      display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 14px 28px;
-      border-radius: 12px;
-      background: #25d366;
-      color: #fff;
+      justify-content: center;
+      gap: 10px;
+      padding: 16px 24px;
+      border-radius: 14px;
       font-weight: 700;
       font-size: 16px;
       text-decoration: none;
-      transition: transform 0.2s;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
-    .whatsapp:hover {
-      transform: scale(1.05);
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+    .btn-menu {
+      background: linear-gradient(135deg, #581c87, #7c3aed);
+      color: #fff;
+    }
+    .btn-whatsapp {
+      background: #25d366;
+      color: #fff;
+    }
+    .btn:active {
+      transform: scale(0.98);
     }
     .horario {
       margin-top: 20px;
@@ -87,16 +106,21 @@
   <h1>Pizza Boa</h1>
   <p class="slogan">Delivery</p>
 
-  <div class="info">
+  <div class="card">
     <p>📍 Piracicaba - SP</p>
     <p>🕐 Terça a Domingo</p>
     <p><strong>18h - 01h</strong></p>
   </div>
 
-  <a class="whatsapp" href="https://wa.me/19984356289" target="_blank">
-    📱 Fale conosco no WhatsApp
-  </a>
+  <div class="links">
+    <a class="btn btn-menu" href="https://pizza-boa-app.vercel.app">
+      🍕 Ver Cardápio e Pedir
+    </a>
+    <a class="btn btn-whatsapp" href="https://wa.me/19984356289" target="_blank">
+      📱 Falar no WhatsApp
+    </a>
+  </div>
 
-  <p class="horario">Peça pelo WhatsApp ou visite-nos!</p>
+  <p class="horario">Peça pelo cardápio online ou pelo WhatsApp!</p>
 </body>
 </html>
